@@ -59,6 +59,7 @@
 			}).catch((error) => {
 				document.getElementById("statusMessage").innerText = "❌ Error checking database: " + error.message;
 			});
+			
 		}
 
 
@@ -137,81 +138,104 @@
     </script>
 
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+				body {
+			font-family: 'Arial', sans-serif;
+			background: linear-gradient(135deg, #1e3c72, #2a5298);
+			color: white;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			padding: 15px; /* Added padding to prevent elements from touching edges */
+			box-sizing: border-box;
+		}
 
-        .container {
-            background: white;
-            color: #333;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            max-width: 500px;
-            text-align: center;
-        }
+		.container {
+			background: white;
+			color: #333;
+			padding: 20px;
+			border-radius: 12px;
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+			max-width: 90%; /* Reduced from 500px for better fit on mobile */
+			width: 100%;
+			text-align: center;
+		}
 
-        h2 {
-            color: #2a5298;
-        }
+		h2 {
+			color: #2a5298;
+			font-size: 20px; /* Slightly reduced for mobile readability */
+		}
 
-        .input-field {
-            margin: 10px 0;
-            padding: 12px;
-            width: 90%;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-        }
+		.input-field {
+			margin: 10px 0;
+			padding: 12px;
+			width: 90%; /* Full width for better mobile adaptation */
+			border: 2px solid #ccc;
+			border-radius: 6px;
+			font-size: 16px; /* Increased for better readability */
+		}
 
-        .button {
-            padding: 12px;
-            width:l00%;
-            margin: 10px 0;
-            border: none;
-            border-radius: 6px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+		.button {
+			padding: 12px;
+			width: 100%; /* Fixed typo: changed 'l00%' to '100%' */
+			margin: 10px 0;
+			border: none;
+			border-radius: 6px;
+			background: linear-gradient(135deg, #6a11cb, #2575fc);
+			color: white;
+			font-size: 18px; /* Increased font size for better tap accessibility */
+			cursor: pointer;
+			transition: 0.3s;
+		}
 
-        .button:hover {
-            background: linear-gradient(135deg, #2575fc, #6a11cb);
-        }
+		.button:hover {
+			background: linear-gradient(135deg, #2575fc, #6a11cb);
+		}
 
-        #searchButton {
-            display: none;
-        }
+		#searchButton {
+			display: none;
+		}
 
-        #results {
-            margin-top: 20px;
-            text-align: left;
-        }
+		#results {
+			margin-top: 20px;
+			text-align: left;
+		}
 
-        .result-item {
-            margin: 10px 0;
-            padding: 8px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            color: #333;
-        }
+		.result-item {
+			margin: 10px 0;
+			padding: 10px;
+			background: #f0f0f0;
+			border-radius: 6px;
+			color: #333;
+			font-size: 16px; /* Improved readability */
+		}
 
-        .result-item p {
-            margin: 0;
-            font-size: 14px;
-        }
+		.result-item p {
+			margin: 0;
+			font-size: 14px;
+		}
 
-        #addFormContainer {
-            display: none;
-            margin-top: 20px;
-        }
+		#addFormContainer {
+			display: none;
+			margin-top: 20px;
+		}
+
+		/* Responsive design */
+		@media (max-width: 480px) {
+			body {
+				height: auto; /* Allow scrolling if content overflows */
+				padding: 20px;
+			}
+
+			.container {
+				padding: 15px; /* Reduce padding for small screens */
+			}
+
+			.button {
+				font-size: 16px; /* Adjust button size */
+			}
+		}
+
     </style>
 </head>
 <body>
