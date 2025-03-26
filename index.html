@@ -44,73 +44,88 @@
         }
 
         // Search for a phrase across both pending and approved
-        async function searchPhraseInFirebase(searchTerm) {
-            if (!searchTerm) {
-                document.getElementById("results").innerHTML = "";
-                return;
-            }
+async function searchPhraseInFirebase(searchTerm) {
+    if (!searchTerm) {
+        document.getElementById("results").innerHTML = "";
+        return;
+    }
 
-            const phrasesRef = ref(db, 'pending_submissions');  
-            const approvedPhrasesRef = ref(db, 'approved_phrases');  
+    const phrasesRef = ref(db, 'pending_submissions');  
+    const approvedPhrasesRef = ref(db, 'approved_phrases');  
 
-            const searchQuery = query(phrasesRef);
-            const approvedQuery = query(approvedPhrasesRef);
+    const searchQuery = query(phrasesRef);
+    const approvedQuery = query(approvedPhrasesRef);
 
-            document.getElementById("results").innerHTML = "<p>Loading...</p>";
+    document.getElementById("results").innerHTML = "<p>Loading...</p>";
 
-            try {
-                const snapshotPending = await get(searchQuery);
-                const snapshotApproved = await get(approvedQuery);
+    try {
+        const snapshotPending = await get(searchQuery);
+        const snapshotApproved = await get(approvedQuery);
 
-                const resultsContainer = document.getElementById("results");
-                resultsContainer.innerHTML = "";
+        const resultsContainer = document.getElementById("results");
+        resultsContainer.innerHTML = "";
 
-                let results = [];
+        let results = [];
+        let maxResults = 5; // We will only display up to 5 results
 
-                // Search in pending submissions
-                if (snapshotPending.exists()) {
-                    snapshotPending.forEach((childSnapshot) => {
-                        const entry = childSnapshot.val();
-                        const phraseLower = entry.phrase.toLowerCase();
-                        const translationLower = entry.translation.toLowerCase();
-                        const searchTermLower = searchTerm.toLowerCase();
-
-                        if (phraseLower.includes(searchTermLower) || translationLower.includes(searchTermLower)) {
-                            results.push(entry);
-                        }
-                    });
-                }
-
-                // Search in approved phrases
-                if (snapshotApproved.exists()) {
-                    snapshotApproved.forEach((childSnapshot) => {
-                        const entry = childSnapshot.val();
-                        const phraseLower = entry.phrase.toLowerCase();
-                        const translationLower = entry.translation.toLowerCase();
-                        const searchTermLower = searchTerm.toLowerCase();
-
-                        if (phraseLower.includes(searchTermLower) || translationLower.includes(searchTermLower)) {
-                            results.push(entry);
-                        }
-                    });
-                }
-
-                if (results.length > 0) {
-                    results.forEach(entry => {
-                        resultsContainer.innerHTML += `
-                            <div class="result-item">
-                                <p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
-                            </div>
-                        `;
-                    });
-                } else {
-                    resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
-                }
-            } catch (error) {
-                console.error("Error searching phrase:", error);
-                document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
-            }
+        // Helper function to check how closely a phrase matches
+        function isMatching(entry, searchTerm) {
+            const phraseLower = entry.phrase.toLowerCase();
+            const translationLower = entry.translation.toLowerCase();
+            const searchTermLower = searchTerm.toLowerCase();
+            
+            // Simple scoring for matching phrase and translation
+            let score = 0;
+            if (phraseLower.includes(searchTermLower)) score += 2; // More weight on phrase match
+            if (translationLower.includes(searchTermLower)) score += 1; // Less weight on translation match
+            
+            return score > 0;
         }
+
+        // Search in pending submissions
+        if (snapshotPending.exists()) {
+            snapshotPending.forEach((childSnapshot) => {
+                const entry = childSnapshot.val();
+                
+                if (isMatching(entry, searchTerm)) {
+                    results.push(entry);
+                }
+
+                // If we have reached maxResults, stop processing
+                if (results.length >= maxResults) return;
+            });
+        }
+
+        // Search in approved phrases
+        if (snapshotApproved.exists()) {
+            snapshotApproved.forEach((childSnapshot) => {
+                const entry = childSnapshot.val();
+
+                if (isMatching(entry, searchTerm)) {
+                    results.push(entry);
+                }
+
+                // If we have reached maxResults, stop processing
+                if (results.length >= maxResults) return;
+            });
+        }
+
+        if (results.length > 0) {
+            results.forEach(entry => {
+                resultsContainer.innerHTML += `
+                    <div class="result-item">
+                        <p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
+                    </div>
+                `;
+            });
+        } else {
+            resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
+        }
+    } catch (error) {
+        console.error("Error searching phrase:", error);
+        document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
+    }
+}
 
         // Event listener for search input
         document.getElementById("searchInput").addEventListener("input", (event) => {
