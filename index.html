@@ -43,89 +43,104 @@
             });
         }
 
-			// Search for a phrase across both pending and approved
-			async function searchPhraseInFirebase(searchTerm) {
-				if (!searchTerm) {
-					document.getElementById("results").innerHTML = "";
-					return;
-				}
+		let debounceTimer;
 
-				const phrasesRef = ref(db, 'pending_submissions');
-				const approvedPhrasesRef = ref(db, 'approved_phrases');
-
-				const searchTermLower = searchTerm.toLowerCase();
-				const maxResults = 5;  // Max results to return
-
-				document.getElementById("results").innerHTML = "<p>Loading...</p>";
-
-				try {
-					// Parallel queries for pending and approved phrases
-					const [snapshotPending, snapshotApproved] = await Promise.all([
-						get(phrasesRef),
-						get(approvedPhrasesRef)
-					]);
-
-					const resultsContainer = document.getElementById("results");
-					resultsContainer.innerHTML = "";
-
-					let results = [];
-					let stopSearch = false; // Flag to stop the search when we reach maxResults
-
-					// Function to process snapshot data
-					const processSnapshot = (snapshot) => {
-						snapshot.forEach((childSnapshot) => {
-							if (stopSearch) return; // Stop if maxResults are already met
-
-							const entry = childSnapshot.val();
-							const phraseLower = entry.phrase.toLowerCase();
-							const translationLower = entry.translation.toLowerCase();
-
-							// Simple matching logic
-							if (phraseLower.includes(searchTermLower) || translationLower.includes(searchTermLower)) {
-								results.push(entry);
-							}
-
-							if (results.length >= maxResults) {
-								stopSearch = true; // Set flag to stop the search
-								return; // Break out of the loop
-							}
-						});
-					};
-
-					// Process both snapshots
-					if (snapshotPending.exists()) {
-						processSnapshot(snapshotPending);
-					}
-
-					if (snapshotApproved.exists() && !stopSearch) {  // Only continue searching approved if we haven't found enough results yet
-						processSnapshot(snapshotApproved);
-					}
-
-					// Display results
-					if (results.length > 0) {
-						results.forEach(entry => {
-							resultsContainer.innerHTML += `
-								<div class="result-item">
-									<p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
-								</div>
-							`;
-						});
-					} else {
-						resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
-					}
-				} catch (error) {
-					console.error("Error searching phrase:", error);
-					document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
-				}
+		async function searchPhraseInFirebase(searchTerm) {
+			if (!searchTerm) {
+				document.getElementById("results").innerHTML = ""; // Clear results if no search term
+				return;
 			}
 
+			const phrasesRef = ref(db, 'pending_submissions');
+			const approvedPhrasesRef = ref(db, 'approved_phrases');
 
+			const searchTermLower = searchTerm.toLowerCase();
+			const maxResults = 5;  // Max results to return
 
+			document.getElementById("results").innerHTML = "<p>Loading...</p>"; // Show loading indicator
 
-        // Event listener for search input
-        document.getElementById("searchInput").addEventListener("input", (event) => {
-            searchPhraseInFirebase(event.target.value.trim());
-        });
+			try {
+				// Parallel queries for pending and approved phrases
+				const [snapshotPending, snapshotApproved] = await Promise.all([
+					get(phrasesRef),
+					get(approvedPhrasesRef)
+				]);
+
+				const resultsContainer = document.getElementById("results");
+				resultsContainer.innerHTML = "";  // Clear previous results
+
+				let exactMatches = [];
+				let partialMatches = [];
+				
+				// Function to process snapshot data
+				const processSnapshot = (snapshot) => {
+					snapshot.forEach((childSnapshot) => {
+						const entry = childSnapshot.val();
+						const phraseLower = entry.phrase.toLowerCase();
+						const translationLower = entry.translation.toLowerCase();
+
+						// Check for exact match first
+						if (phraseLower === searchTermLower || translationLower === searchTermLower) {
+							exactMatches.push(entry); // Add exact match
+						}
+						// Check for partial match if no exact match
+						else if (phraseLower.includes(searchTermLower) || translationLower.includes(searchTermLower)) {
+							partialMatches.push(entry); // Add partial match
+						}
+					});
+				};
+
+				// Process both snapshots
+				if (snapshotPending.exists()) {
+					processSnapshot(snapshotPending);
+				}
+
+				if (snapshotApproved.exists()) {
+					processSnapshot(snapshotApproved);
+				}
+
+				// Combine exact and partial matches and sort them
+				const allResults = [...exactMatches, ...partialMatches];
+
+				// Sort results to prioritize exact matches
+				allResults.sort((a, b) => {
+					const aIsExact = a.phrase.toLowerCase() === searchTermLower || a.translation.toLowerCase() === searchTermLower;
+					const bIsExact = b.phrase.toLowerCase() === searchTermLower || b.translation.toLowerCase() === searchTermLower;
+					return bIsExact - aIsExact; // Prioritize exact matches (true > false)
+				});
+
+				// Limit the results to maxResults
+				const limitedResults = allResults.slice(0, maxResults);
+
+				// Display results
+				if (limitedResults.length > 0) {
+					limitedResults.forEach(entry => {
+						resultsContainer.innerHTML += `
+							<div class="result-item">
+								<p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
+							</div>
+						`;
+					});
+				} else {
+					resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
+				}
+			} catch (error) {
+				console.error("Error searching phrase:", error);
+				document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
+			}
+		}
+
+		// Debounce function to limit the number of calls to the search function
+		function debounceSearch(event) {
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(() => {
+				searchPhraseInFirebase(event.target.value);
+			}, 300);  // Wait 300ms after the user stops typing
+		}
+
+		// Event listener for the search input field
+		document.getElementById("searchInput").addEventListener("input", debounceSearch);
+
 
         // Event listener for add new phrase checkbox
         document.getElementById("addNewCheckbox").addEventListener("change", function() {
