@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English To Kunama Translation</title>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, push, set, query, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyOgYzDMZdo5V21T8fgHTvPhfgIavuxBA",
+            authDomain: "kunama-academy-data.firebaseapp.com",
+            databaseURL: "https://kunama-academy-data-default-rtdb.firebaseio.com",
+            projectId: "kunama-academy-data",
+            storageBucket: "kunama-academy-data.firebasestorage.app",
+            messagingSenderId: "1089407925060",
+            appId: "1:1089407925060:web:260a1f597ed520fc977511"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Add New Phrase to Firebase (pending for approval)
+        function addNewPhraseToFirebase(phrase, translation) {
+            const newSubmissionsRef = ref(db, 'pending_submissions');
+            const newPhraseRef = push(newSubmissionsRef);
+            set(newPhraseRef, { 
+                phrase, 
+                translation, 
+                timestamp: new Date().toISOString()
+            }).then(() => {
+                document.getElementById("statusMessage").innerText = "✅ Phrase submitted, waiting for approval!";
+                document.getElementById("newPhrase").value = "";  
+                document.getElementById("newTranslation").value = "";
+                setTimeout(() => {
+                    document.getElementById("statusMessage").innerText = "";
+                }, 3000);  // Clear the status message after 3 seconds
+            }).catch((error) => {
+                document.getElementById("statusMessage").innerText = "❌ Error: " + error.message;
+            });
+        }
+
+        // Search for a phrase across both pending and approved
+        async function searchPhraseInFirebase(searchTerm) {
+            if (!searchTerm) {
+                document.getElementById("results").innerHTML = "";
+                return;
+            }
+
+            const phrasesRef = ref(db, 'pending_submissions');  
+            const approvedPhrasesRef = ref(db, 'approved_phrases');  
+
+            const searchQuery = query(phrasesRef);
+            const approvedQuery = query(approvedPhrasesRef);
+
+            document.getElementById("results").innerHTML = "<p>Loading...</p>";
+
+            try {
+                const snapshotPending = await get(searchQuery);
+                const snapshotApproved = await get(approvedQuery);
+
+                const resultsContainer = document.getElementById("results");
+                resultsContainer.innerHTML = "";
+
+                let results = [];
+
+                // Search in pending submissions
+                if (snapshotPending.exists()) {
+                    snapshotPending.forEach((childSnapshot) => {
+                        const entry = childSnapshot.val();
+                        const phraseLower = entry.phrase.toLowerCase();
+                        const translationLower = entry.translation.toLowerCase();
+                        const searchTermLower = searchTerm.toLowerCase();
+
+                        if (phraseLower.includes(searchTermLower) || translationLower.includes(searchTermLower)) {
+                            results.push(entry);
+                        }
+                    });
+                }
+
+                // Search in approved phrases
+                if (snapshotApproved.exists()) {
+                    snapshotApproved.forEach((childSnapshot) => {
+                        const entry = childSnapshot.val();
+                        const phraseLower = entry.phrase.toLowerCase();
+                        const translationLower = entry.translation.toLowerCase();
+                        const searchTermLower = searchTerm.toLowerCase();
+
+                        if (phraseLower.includes(searchTermLower) || translationLower.includes(searchTermLower)) {
+                            results.push(entry);
+                        }
+                    });
+                }
+
+                if (results.length > 0) {
+                    results.forEach(entry => {
+                        resultsContainer.innerHTML += `
+                            <div class="result-item">
+                                <p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
+                }
+            } catch (error) {
+                console.error("Error searching phrase:", error);
+                document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
+            }
+        }
+
+        // Event listener for search input
+        document.getElementById("searchInput").addEventListener("input", (event) => {
+            searchPhraseInFirebase(event.target.value.trim());
+        });
+
+        // Event listener for add new phrase checkbox
+        document.getElementById("addNewCheckbox").addEventListener("change", function() {
+            document.getElementById("addFormContainer").style.display = this.checked ? "block" : "none";
+        });
+
+        // Event listener for add phrase button
+        document.getElementById("addPhraseButton").addEventListener("click", () => {
+            const phrase = document.getElementById("newPhrase").value.trim();
+            const translation = document.getElementById("newTranslation").value.trim();
+            if (phrase && translation) {
+                addNewPhraseToFirebase(phrase, translation);
+            } else {
+                document.getElementById("statusMessage").innerText = "❗ Please enter both phrase and translation.";
+            }
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            color: #2a5298;
+            font-size: 20px;
+        }
+
+        .input-field {
+            margin: 10px 0;
+            padding: 12px;
+            width: 90%;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .button {
+            padding: 12px;
+            width: 100%;
+            margin: 10px 0;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+        }
+
+        #searchButton {
+            display: none;
+        }
+
+        #results {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        #addFormContainer {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            body {
+                height: auto;
+                padding: 20px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .button {
+                font-size: 16px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔎 English to Kunama Translation</h2>
+        <input type="text" id="searchInput" class="input-field" placeholder="Search for a phrase or translation">
+        <div id="results"></div>
+        <div id="statusMessage"></div>
+        <label>
+            <input type="checkbox" id="addNewCheckbox"> Add New Phrase
+        </label>
+        <div id="addFormContainer">
+            <input type="text" id="newPhrase" class="input-field" placeholder="Enter new phrase">
+            <input type="text" id="newTranslation" class="input-field" placeholder="Enter translation">
+            <button id="addPhraseButton" class="button">Add Phrase</button>
+        </div>
+    </div>
+</body>
+</html>
