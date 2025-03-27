@@ -51,18 +51,17 @@
 				return;
 			}
 
-			const phrasesRef = ref(db, 'pending_submissions');
+			
 			const approvedPhrasesRef = ref(db, 'approved_phrases');
 
 			const searchTermLower = searchTerm.toLowerCase();
-			const maxResults = 5;  // Max results to return
+			const maxResults = 3;  // Max results to return
 
 			document.getElementById("results").innerHTML = "<p>Loading...</p>"; // Show loading indicator
 
 			try {
-				// Parallel queries for pending and approved phrases
-				const [snapshotPending, snapshotApproved] = await Promise.all([
-					get(phrasesRef),
+				// Parallel queries for approved phrases
+				const [snapshotApproved] = await Promise.all([
 					get(approvedPhrasesRef)
 				]);
 
@@ -91,10 +90,6 @@
 				};
 
 				// Process both snapshots
-				if (snapshotPending.exists()) {
-					processSnapshot(snapshotPending);
-				}
-
 				if (snapshotApproved.exists()) {
 					processSnapshot(snapshotApproved);
 				}
@@ -258,7 +253,7 @@
 <body>
     <div class="container">
         <h2>🔎 English to Kunama Translation</h2>
-        <input type="text" id="searchInput" class="input-field" placeholder="Search for a phrase or translation">
+        <input type="text" id="searchInput" class="input-field" placeholder="Search for a word or phrase">
         <div id="results"></div>
         <div id="statusMessage"></div>
         <label>
