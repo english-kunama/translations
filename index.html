@@ -247,6 +247,27 @@
                 font-size: 16px;
             }
         }
+		/* Style the Contact Us link */
+		#contactUsLink {
+			position: fixed;  /* Fix it in place */
+			bottom: 20px;  /* Distance from the bottom of the page */
+			right: 20px;   /* Distance from the right of the page */
+			font-size: 14px;  /* Smaller font size */
+			color: #fff;  /* White text */
+			background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
+			padding: 8px 12px;  /* Padding around the link */
+			border-radius: 6px;  /* Rounded corners */
+			text-decoration: none;  /* Remove underline */
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);  /* Add a small shadow */
+			transition: all 0.3s ease;  /* Smooth transition for hover effect */
+		}
+
+		#contactUsLink:hover {
+			background-color: rgba(0, 0, 0, 0.8);  /* Darker background on hover */
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);  /* Stronger shadow on hover */
+		}
+
+
 
     </style>
 </head>
@@ -264,6 +285,8 @@
             <input type="text" id="newTranslation" class="input-field" placeholder="Enter translation">
             <button id="addPhraseButton" class="button">Add Phrase</button>
         </div>
+
     </div>
+	<a href="https://www.facebook.com/NativeEritrean" target="_blank" id="contactUsLink">Contact Us</a>
 </body>
 </html>
