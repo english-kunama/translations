@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +24,25 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Add New Phrase to Firebase (pending for approval)
+        // Function to update the progress bar based on total submission count
+        function updateProgressBar() {
+            const goal = 5000; // Total goal of submissions
+            const submissionCountRef = ref(db, 'submission_count');  // Reference to 'submission_count'
+
+            // Get the current submission count
+            get(submissionCountRef).then((snapshot) => {
+                const numSubmissions = snapshot.exists() ? snapshot.val() : 0;  // Get the current submission count
+                const percentage = Math.min((numSubmissions / goal) * 100, 100);  // Ensure percentage does not exceed 100%
+
+                // Update the progress bar
+                document.getElementById("progressBar").style.width = percentage + "%";
+                document.getElementById("progressText").innerText = `${numSubmissions} / ${goal} submissions (${Math.round(percentage)}%)`;
+            }).catch((error) => {
+                console.error("Error fetching submission count:", error);
+            });
+        }
+
+        // Function to add a new phrase to Firebase (pending for approval)
         function addNewPhraseToFirebase(phrase, translation) {
             const newSubmissionsRef = ref(db, 'pending_submissions');
             const newPhraseRef = push(newSubmissionsRef);
@@ -32,9 +51,31 @@
                 translation, 
                 timestamp: new Date().toISOString()
             }).then(() => {
+                // Increment the submission count
+                const submissionCountRef = ref(db, 'submission_count');
+                get(submissionCountRef).then((snapshot) => {
+                    const currentCount = snapshot.exists() ? snapshot.val() : 0;
+                    const newCount = currentCount + 1;
+
+                    // Update the submission count
+                    set(submissionCountRef, newCount)
+                        .then(() => {
+                            console.log("Submission count updated successfully!");
+                        })
+                        .catch((error) => {
+                            console.error("Error updating submission count:", error);
+                        });
+                }).catch((error) => {
+                    console.error("Error fetching submission count:", error);
+                });
+
                 document.getElementById("statusMessage").innerText = "✅ Phrase submitted, waiting for approval!";
                 document.getElementById("newPhrase").value = "";  
                 document.getElementById("newTranslation").value = "";
+
+                // Update the progress bar after successful submission
+                updateProgressBar();
+
                 setTimeout(() => {
                     document.getElementById("statusMessage").innerText = "";
                 }, 3000);  // Clear the status message after 3 seconds
@@ -43,99 +84,95 @@
             });
         }
 
-		let debounceTimer;
+        let debounceTimer;
 
-		async function searchPhraseInFirebase(searchTerm) {
-			if (!searchTerm) {
-				document.getElementById("results").innerHTML = ""; // Clear results if no search term
-				return;
-			}
+        async function searchPhraseInFirebase(searchTerm) {
+            if (!searchTerm) {
+                document.getElementById("results").innerHTML = ""; // Clear results if no search term
+                return;
+            }
 
-			
-			const approvedPhrasesRef = ref(db, 'approved_phrases');
+            const approvedPhrasesRef = ref(db, 'approved_phrases');
 
-			const searchTermLower = searchTerm.toLowerCase();
-			const maxResults = 3;  // Max results to return
+            const searchTermLower = searchTerm.toLowerCase();
+            const maxResults = 3;  // Max results to return
 
-			document.getElementById("results").innerHTML = "<p>Loading...</p>"; // Show loading indicator
+            document.getElementById("results").innerHTML = "<p>Loading...</p>"; // Show loading indicator
 
-			try {
-				// Parallel queries for approved phrases
-				const [snapshotApproved] = await Promise.all([
-					get(approvedPhrasesRef)
-				]);
+            try {
+                // Parallel queries for approved phrases
+                const [snapshotApproved] = await Promise.all([get(approvedPhrasesRef)]);
 
-				const resultsContainer = document.getElementById("results");
-				resultsContainer.innerHTML = "";  // Clear previous results
+                const resultsContainer = document.getElementById("results");
+                resultsContainer.innerHTML = "";  // Clear previous results
 
-				let exactMatches = [];
-				let partialMatches = [];
-				
-				// Function to process snapshot data
-				const processSnapshot = (snapshot) => {
-					snapshot.forEach((childSnapshot) => {
-						const entry = childSnapshot.val();
-						const phraseLower = entry.phrase.toLowerCase();
-						const translationLower = entry.translation.toLowerCase();
+                let exactMatches = [];
+                let partialMatches = [];
+                
+                // Function to process snapshot data
+                const processSnapshot = (snapshot) => {
+                    snapshot.forEach((childSnapshot) => {
+                        const entry = childSnapshot.val();
+                        const phraseLower = entry.phrase.toLowerCase();
+                        const translationLower = entry.translation.toLowerCase();
 
-						// Check for exact match first
-						if (phraseLower === searchTermLower || translationLower === searchTermLower) {
-							exactMatches.push(entry); // Add exact match
-						}
-						// Check for partial match if no exact match
-						else if (phraseLower.includes(searchTermLower) || translationLower.includes(searchTermLower)) {
-							partialMatches.push(entry); // Add partial match
-						}
-					});
-				};
+                        // Check for exact match first
+                        if (phraseLower === searchTermLower || translationLower === searchTermLower) {
+                            exactMatches.push(entry); // Add exact match
+                        }
+                        // Check for partial match if no exact match
+                        else if (phraseLower.includes(searchTermLower) || translationLower.includes(searchTermLower)) {
+                            partialMatches.push(entry); // Add partial match
+                        }
+                    });
+                };
 
-				// Process both snapshots
-				if (snapshotApproved.exists()) {
-					processSnapshot(snapshotApproved);
-				}
+                // Process both snapshots
+                if (snapshotApproved.exists()) {
+                    processSnapshot(snapshotApproved);
+                }
 
-				// Combine exact and partial matches and sort them
-				const allResults = [...exactMatches, ...partialMatches];
+                // Combine exact and partial matches and sort them
+                const allResults = [...exactMatches, ...partialMatches];
 
-				// Sort results to prioritize exact matches
-				allResults.sort((a, b) => {
-					const aIsExact = a.phrase.toLowerCase() === searchTermLower || a.translation.toLowerCase() === searchTermLower;
-					const bIsExact = b.phrase.toLowerCase() === searchTermLower || b.translation.toLowerCase() === searchTermLower;
-					return bIsExact - aIsExact; // Prioritize exact matches (true > false)
-				});
+                // Sort results to prioritize exact matches
+                allResults.sort((a, b) => {
+                    const aIsExact = a.phrase.toLowerCase() === searchTermLower || a.translation.toLowerCase() === searchTermLower;
+                    const bIsExact = b.phrase.toLowerCase() === searchTermLower || b.translation.toLowerCase() === searchTermLower;
+                    return bIsExact - aIsExact; // Prioritize exact matches (true > false)
+                });
 
-				// Limit the results to maxResults
-				const limitedResults = allResults.slice(0, maxResults);
+                // Limit the results to maxResults
+                const limitedResults = allResults.slice(0, maxResults);
 
-				// Display results
-				if (limitedResults.length > 0) {
-					limitedResults.forEach(entry => {
-						resultsContainer.innerHTML += `
-							<div class="result-item">
-								<p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
-							</div>
-						`;
-					});
-				} else {
-					resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
-				}
-			} catch (error) {
-				console.error("Error searching phrase:", error);
-				document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
-			}
-		}
+                // Display results
+                if (limitedResults.length > 0) {
+                    limitedResults.forEach(entry => {
+                        resultsContainer.innerHTML += `
+                            <div class="result-item">
+                                <p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
+                }
+            } catch (error) {
+                console.error("Error searching phrase:", error);
+                document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
+            }
+        }
 
-		// Debounce function to limit the number of calls to the search function
-		function debounceSearch(event) {
-			clearTimeout(debounceTimer);
-			debounceTimer = setTimeout(() => {
-				searchPhraseInFirebase(event.target.value);
-			}, 300);  // Wait 300ms after the user stops typing
-		}
+        // Debounce function to limit the number of calls to the search function
+        function debounceSearch(event) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                searchPhraseInFirebase(event.target.value);
+            }, 300);  // Wait 300ms after the user stops typing
+        }
 
-		// Event listener for the search input field
-		document.getElementById("searchInput").addEventListener("input", debounceSearch);
-
+        // Event listener for the search input field
+        document.getElementById("searchInput").addEventListener("input", debounceSearch);
 
         // Event listener for add new phrase checkbox
         document.getElementById("addNewCheckbox").addEventListener("change", function() {
@@ -247,46 +284,46 @@
                 font-size: 16px;
             }
         }
-		/* Style the Contact Us link */
-		#contactUsLink {
-			position: fixed;  /* Fix it in place */
-			bottom: 20px;  /* Distance from the bottom of the page */
-			right: 20px;   /* Distance from the right of the page */
-			font-size: 14px;  /* Smaller font size */
-			color: #fff;  /* White text */
-			background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
-			padding: 8px 12px;  /* Padding around the link */
-			border-radius: 6px;  /* Rounded corners */
-			text-decoration: none;  /* Remove underline */
-			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);  /* Add a small shadow */
-			transition: all 0.3s ease;  /* Smooth transition for hover effect */
-		}
 
-		#contactUsLink:hover {
-			background-color: rgba(0, 0, 0, 0.8);  /* Darker background on hover */
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);  /* Stronger shadow on hover */
-		}
+        /* Style the progress bar */
+        #progressContainer {
+            margin-top: 20px;
+            text-align: center;
+        }
 
-
-
+        #progressBar {
+            height: 20px;
+            width: 0%;
+            background-color: #4caf50;
+            border-radius: 5px;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h2>🔎 English to Kunama Translation</h2>
-        <input type="text" id="searchInput" class="input-field" placeholder="Search for a word or phrase">
+        <h2>🔎 English ↔ Kunama Translation</h2>
+        <input type="text" id="searchInput" class="input-field" placeholder="Start typing...">
         <div id="results"></div>
         <div id="statusMessage"></div>
+
         <label>
-            <input type="checkbox" id="addNewCheckbox"> Add New Phrase
+            <input type="checkbox" id="addNewCheckbox"> Add New (Tama Kitafe)
         </label>
         <div id="addFormContainer">
             <input type="text" id="newPhrase" class="input-field" placeholder="Enter new phrase">
             <input type="text" id="newTranslation" class="input-field" placeholder="Enter translation">
-            <button id="addPhraseButton" class="button">Add Phrase</button>
+            <button id="addPhraseButton" class="button">Add (Itafe) </button>
         </div>
-
+        <!-- Progress bar -->
+        <div id="progressContainer">
+            <p id="progressText">0/5000 submissions needed from users (0%)</p>
+            <div style="background-color: #ccc; border-radius: 5px; height: 20px; width: 100%;">
+                <div id="progressBar"></div>
+            </div>
+        </div>
     </div>
-	<a href="https://www.facebook.com/NativeEritrean" target="_blank" id="contactUsLink">Contact Us</a>
+    <a href="https://www.facebook.com/NativeEritrean" target="_blank" id="contactUsLink">Contact Us</a>
 </body>
+
 </html>
