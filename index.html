@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English To Kunama Translation</title>
+    <title>English ↔ Kunama Translation</title>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -148,7 +148,7 @@
                 // Display results
                 if (limitedResults.length > 0) {
                     limitedResults.forEach(entry => {
-                        resultsContainer.innerHTML += `
+                        resultsContainer.innerHTML += ` 
                             <div class="result-item">
                                 <p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
                             </div>
@@ -189,6 +189,9 @@
                 document.getElementById("statusMessage").innerText = "❗ Please enter both phrase and translation.";
             }
         });
+
+        // Call updateProgressBar on page load to set the initial progress
+        window.onload = updateProgressBar;
     </script>
 
     <style>
@@ -298,24 +301,24 @@
             border-radius: 5px;
         }
         /* Style the Contact Us link */
- 		#contactUsLink {
- 			position: fixed;  /* Fix it in place */
- 			bottom: 20px;  /* Distance from the bottom of the page */
- 			right: 20px;   /* Distance from the right of the page */
- 			font-size: 14px;  /* Smaller font size */
- 			color: #fff;  /* White text */
- 			background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
- 			padding: 8px 12px;  /* Padding around the link */
- 			border-radius: 6px;  /* Rounded corners */
- 			text-decoration: none;  /* Remove underline */
- 			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);  /* Add a small shadow */
- 			transition: all 0.3s ease;  /* Smooth transition for hover effect */
- 		}
- 
- 		#contactUsLink:hover {
- 			background-color: rgba(0, 0, 0, 0.8);  /* Darker background on hover */
- 			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);  /* Stronger shadow on hover */
- 		}
+        #contactUsLink {
+            position: fixed;  /* Fix it in place */
+            bottom: 20px;  /* Distance from the bottom of the page */
+            right: 20px;   /* Distance from the right of the page */
+            font-size: 14px;  /* Smaller font size */
+            color: #fff;  /* White text */
+            background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
+            padding: 8px 12px;  /* Padding around the link */
+            border-radius: 6px;  /* Rounded corners */
+            text-decoration: none;  /* Remove underline */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);  /* Add a small shadow */
+            transition: all 0.3s ease;  /* Smooth transition for hover effect */
+        }
+
+        #contactUsLink:hover {
+            background-color: rgba(0, 0, 0, 0.8);  /* Darker background on hover */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);  /* Stronger shadow on hover */
+        }
     </style>
 </head>
 
@@ -336,7 +339,7 @@
         </div>
         <!-- Progress bar -->
         <div id="progressContainer">
-            <p id="progressText">0/5000 submissions needed (0%)</p>
+            <p id="progressText">0/5000 submissions needed from users (0%)</p>
             <div style="background-color: #ccc; border-radius: 5px; height: 20px; width: 100%;">
                 <div id="progressBar"></div>
             </div>
