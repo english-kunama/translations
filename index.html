@@ -69,7 +69,7 @@
                     console.error("Error fetching submission count:", error);
                 });
 
-                document.getElementById("statusMessage").innerText = "✅ Phrase submitted, waiting for approval!";
+                document.getElementById("statusMessage").innerText = "✅ Added, waiting for approval!";
                 document.getElementById("newPhrase").value = "";  
                 document.getElementById("newTranslation").value = "";
 
@@ -333,8 +333,8 @@
             <input type="checkbox" id="addNewCheckbox"> Add New (Tama Kitafe)
         </label>
         <div id="addFormContainer">
-            <input type="text" id="newPhrase" class="input-field" placeholder="Enter new phrase">
-            <input type="text" id="newTranslation" class="input-field" placeholder="Enter translation">
+            <input type="text" id="newPhrase" class="input-field" placeholder="English...">
+            <input type="text" id="newTranslation" class="input-field" placeholder="Kunama...">
             <button id="addPhraseButton" class="button">Add (Itafe) </button>
         </div>
         <!-- Progress bar -->
