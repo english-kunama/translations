@@ -4,14 +4,1006 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" href="https://raw.githubusercontent.com/english-kunama/translations/main/Kunama-Flag.png" type="image/png">
+    <link rel="icon" href="https://raw.githubusercontent.com/english-kunama/translations/main/Kunama-Flag.png" type="image/png">
     <title>English ↔ Kunama Translation</title>
+
+    <!-- CSS Styles -->
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            box-sizing: border-box;
+            margin: 0;
+            transition: background 0.3s ease;
+        }
+
+        /* Container styles */
+        .container {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        h2, h3 {
+            color: #2a5298;
+            font-size: 20px;
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+
+        /* Form element styles */
+        .input-field {
+            margin: 10px 0;
+            padding: 12px;
+            width: 90%;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s ease, background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Form area */
+        #addFormContainer {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        /* Character Counter */
+        .char-counter {
+            display: block;
+            text-align: right;
+            color: #777;
+            font-size: 12px;
+            margin-top: -8px;
+            margin-bottom: 10px;
+            padding-right: 5%;
+        }
+
+        /* Auto-save indicator */
+        .autosave-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            color: #555;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Button styles */
+        .button {
+            padding: 12px;
+            width: 100%;
+            margin: 10px 0;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            transform: translateY(-2px);
+        }
+
+        .button-secondary {
+            background: linear-gradient(135deg, #808080, #a9a9a9);
+        }
+
+        .button-secondary:hover {
+            background: linear-gradient(135deg, #a9a9a9, #808080);
+        }
+
+        .button-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+        }
+
+        #searchButton {
+            display: none;
+        }
+
+        /* Results area */
+        #results {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result-item {
+            margin: 12px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            color: #333;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease, transform 0.2s ease;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .result-content {
+            flex: 1;
+        }
+
+        .result-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .copy-button, .tts-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #555;
+            font-size: 18px;
+            padding: 5px;
+            margin-left: 8px;
+        }
+
+        .copy-button:hover, .tts-button:hover {
+            color: #2575fc;
+        }
+
+        /* Modal dialog */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: #1c3d2b;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        .confirm-details {
+            background: ##5f53e8;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 15px 0;
+            text-align: left;
+            transition: background 0.3s ease;
+        }
+        
+        .confirm-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Search history styles */
+        .history-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            position: absolute;
+            right: 20px;
+            top: 80px;
+        }
+        
+        .search-history-container {
+            position: absolute;
+            top: 120px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            transition: background 0.3s ease;
+        }
+        
+        .search-history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .history-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .history-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Recent translations styles */
+        .recent-translations-container {
+            margin-top: 30px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            text-align: left;
+            transition: background 0.3s ease;
+        }
+        
+        .recent-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+        
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+        
+        .recent-date {
+            color: #888;
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Leaderboard styles */
+        .leaderboard-container {
+            margin-top: 30px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            text-align: left;
+            transition: background 0.3s ease;
+        }
+        
+        .leaderboard-list {
+            padding-left: 25px;
+        }
+        
+        .leaderboard-list li {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .contributor-name {
+            font-weight: bold;
+        }
+        
+        .contribution-count {
+            color: #666;
+        }
+
+        /* Filter styles */
+        .search-filter-container {
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .filter-toggle {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        
+        .filter-toggle:hover {
+            background: #e0e0e0;
+        }
+        
+        .filter-options {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            margin-top: 10px;
+            text-align: left;
+            transition: background 0.3s ease;
+        }
+        
+        .filter-group {
+            margin-bottom: 12px;
+        }
+        
+        .filter-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .checkbox-group label {
+            font-weight: normal;
+        }
+        
+        /* Category tags */
+        .category-tag {
+            display: inline-block;
+            background: #e0e0e0;
+            color: #555;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-top: 5px;
+        }
+
+        /* Pagination styles */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 10px 0;
+        }
+        
+        .page-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .pagination-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .pagination-button {
+            background: #f0f0f0;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .pagination-button:hover {
+            background: #e0e0e0;
+        }
+
+        /* Voting system styles */
+        .vote-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            gap: 5px;
+        }
+        
+        .vote-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .vote-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 3px 5px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        .vote-button:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .vote-count {
+            font-size: 12px;
+            margin-left: 3px;
+        }
+        
+        .vote-message {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            bottom: 30px;
+            right: 10px;
+            animation: fadeInOut 2s forwards;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.success {
+            background: rgba(76, 175, 80, 0.9);
+        }
+        
+        .notification.error {
+            background: rgba(244, 67, 54, 0.9);
+        }
+        
+        /* Search suggestions */
+        .search-suggestions {
+            margin-top: 15px;
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+        
+        .search-suggestions p {
+            margin: 0 0 5px 0;
+            font-weight: bold;
+        }
+        
+        .search-suggestions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .search-suggestions a {
+            color: #2575fc;
+            text-decoration: none;
+        }
+        
+        .search-suggestions a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dark mode styles */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 22px;
+            color: #555;
+            z-index: 5;
+        }
+        
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+        
+        body.dark-mode .container {
+            background: #252525;
+            color: #e0e0e0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        body.dark-mode h2, 
+        body.dark-mode h3 {
+            color: #81a4ff;
+        }
+        
+        body.dark-mode .input-field {
+            background: #333;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+        
+        body.dark-mode .result-item,
+        body.dark-mode #addFormContainer,
+        body.dark-mode .recent-translations-container,
+        body.dark-mode .leaderboard-container,
+        body.dark-mode .filter-options,
+        body.dark-mode .search-history-container,
+        body.dark-mode .modal-content,
+        body.dark-mode .search-suggestions,
+        body.dark-mode #userProfileSection,
+        body.dark-mode #authModal .modal-content {
+            background: #333;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .confirm-details {
+            background: #3a3a3a;
+        }
+        
+        body.dark-mode .recent-item {
+            border-color: #444;
+        }
+        
+        body.dark-mode .vote-label,
+        body.dark-mode .recent-date,
+        body.dark-mode .contribution-count,
+        body.dark-mode .page-info {
+            color: #aaa;
+        }
+        
+        body.dark-mode .filter-toggle,
+        body.dark-mode .pagination-button {
+            background: #444;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .filter-toggle:hover,
+        body.dark-mode .pagination-button:hover {
+            background: #555;
+        }
+        
+        body.dark-mode .category-tag {
+            background: #555;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .history-item {
+            border-color: #444;
+        }
+        
+        body.dark-mode .dark-mode-toggle {
+            color: #e0e0e0;
+        }
+
+        /* User profile styles */
+        #userProfileSection {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            text-align: left;
+            transition: background 0.3s ease;
+            display: none;
+        }
+        
+        .profile-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .profile-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #2a5298;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .profile-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .profile-email {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .profile-actions {
+            margin-top: 10px;
+        }
+
+        /* User menu */
+        .user-menu {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #2a5298;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .user-menu:hover {
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        body.dark-mode .user-menu {
+            background: rgba(40, 40, 40, 0.9);
+            color: #81a4ff;
+        }
+        
+        body.dark-mode .user-menu:hover {
+            background: #333;
+        }
+
+        /* Authentication modal */
+        #authModal .modal-content {
+            max-width: 400px;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .auth-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-right: 5px;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .auth-tab.active {
+            border-bottom: 2px solid #2a5298;
+            font-weight: bold;
+            color: #2a5298;
+        }
+        
+        body.dark-mode .auth-tab.active {
+            border-color: #81a4ff;
+            color: #81a4ff;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .auth-form .input-field {
+            width: 100%;
+        }
+        
+        .auth-switch {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .auth-switch a {
+            color: #2a5298;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        body.dark-mode .auth-switch {
+            color: #aaa;
+        }
+        
+        body.dark-mode .auth-switch a {
+            color: #81a4ff;
+        }
+
+        /* Contact us link */
+        #contactUsLink {
+            position: fixed;  
+            bottom: 20px;  
+            right: 20px;   
+            font-size: 14px;  
+            color: #fff;  
+            background-color: rgba(0, 0, 0, 0.5);  
+            padding: 8px 12px;  
+            border-radius: 6px;  
+            text-decoration: none;  
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);  
+            transition: all 0.3s ease;  
+        }
+        
+        #contactUsLink:hover {
+            background-color: rgba(0, 0, 0, 0.8);  
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);  
+        }
+
+        /* Progress bar styles */
+        #progressContainer {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        #progressBar {
+            height: 20px;
+            width: 0%;
+            background-color: #4caf50;
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                max-width: 95%;
+            }
+            
+            .search-history-container {
+                width: 200px;
+                right: 10px;
+            }
+            
+            .history-button {
+                right: 10px;
+            }
+            
+            .filter-options {
+                position: fixed;
+                left: 5%;
+                right: 5%;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            
+            .modal-content {
+                width: 90%;
+            }
+            
+            #contactUsLink {
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .user-menu {
+                padding: 5px 8px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>🔎 English ↔ Kunama Translation</h2>
+        
+        <!-- User menu button -->
+        <button id="userMenuBtn" class="user-menu">
+            <span id="userIcon">👤</span>
+            <span id="userName">Sign in</span>
+        </button>
+        
+        <!-- Search input -->
+        <input type="text" id="searchInput" class="input-field" placeholder="Start typing...">
+        <!-- Search results container -->
+        <div id="results"></div>
+        <!-- Status message container -->
+        <div id="statusMessage"></div>
+
+        <!-- Add new phrase checkbox -->
+        <label>
+            <input type="checkbox" id="addNewCheckbox"> Add New (Tama Kitafe)
+        </label>
+        
+        <!-- User profile section -->
+        <div id="userProfileSection">
+            <h3>Your Profile</h3>
+            <div class="profile-info">
+                <div class="profile-avatar" id="profileAvatar">?</div>
+                <div>
+                    <div class="profile-name" id="profileName">Anonymous</div>
+                    <div class="profile-email" id="profileEmail"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="displayNameInput">Display Name for Contributions:</label>
+                <input type="text" id="displayNameInput" class="input-field" placeholder="Enter your preferred display name">
+            </div>
+            <div class="profile-actions">
+                <button id="saveProfileBtn" class="button">Save Profile</button>
+                <button id="signOutBtn" class="button button-secondary">Sign Out</button>
+            </div>
+        </div>
+        
+        <!-- Add new phrase form -->
+        <div id="addFormContainer">
+            <input type="text" id="newPhrase" class="input-field" placeholder="Enter new phrase">
+            <input type="text" id="newTranslation" class="input-field" placeholder="Enter translation">
+            <select id="newCategory" class="input-field">
+                <option value="">Select category (optional)</option>
+                <option value="greetings">Greetings</option>
+                <option value="food">Food</option>
+                <option value="family">Family</option>
+                <option value="numbers">Numbers</option>
+                <option value="common">Common Phrases</option>
+            </select>
+            <button id="addPhraseButton" class="button">Add (Itafe)</button>
+        </div>
+        
+        <!-- Progress bar -->
+        <div id="progressContainer">
+            <p id="progressText">0/5000 submissions needed from users (0%)</p>
+            <div style="background-color: #ccc; border-radius: 5px; height: 20px; width: 100%;">
+                <div id="progressBar"></div>
+            </div>
+        </div>
+        
+        <!-- Recent translations container -->
+        <div id="recentTranslations" class="recent-translations-container">
+            <h3>Recently Added</h3>
+            <p>Loading recent translations...</p>
+        </div>
+        
+        <!-- Contributor leaderboard container -->
+        <div id="contributorLeaderboard" class="leaderboard-container">
+            <h3>Top Contributors</h3>
+            <p>Loading leaderboard...</p>
+        </div>
+        
+        <!-- The dark mode toggle will be added here by JavaScript -->
+    </div>
+    
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Sign In or Sign Up</h3>
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="signin">Sign In</div>
+                <div class="auth-tab" data-tab="signup">Sign Up</div>
+            </div>
+            
+            <!-- Sign In Form -->
+            <div id="signinForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="signinEmail">Email:</label>
+                    <input type="email" id="signinEmail" class="input-field" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signinPassword">Password:</label>
+                    <input type="password" id="signinPassword" class="input-field" placeholder="Enter your password">
+                </div>
+                <button id="signinBtn" class="button">Sign In</button>
+                <div class="auth-switch">
+                    Don't have an account? <a id="switchToSignup">Sign up</a>
+                </div>
+                <div class="auth-switch">
+                    Or <a id="continueAnonymously">continue anonymously</a>
+                </div>
+            </div>
+            
+            <!-- Sign Up Form -->
+            <div id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="signupName">Display Name:</label>
+                    <input type="text" id="signupName" class="input-field" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email:</label>
+                    <input type="email" id="signupEmail" class="input-field" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password:</label>
+                    <input type="password" id="signupPassword" class="input-field" placeholder="Enter your password">
+                </div>
+                <button id="signupBtn" class="button">Sign Up</button>
+                <div class="auth-switch">
+                    Already have an account? <a id="switchToSignin">Sign in</a>
+                </div>
+                <div class="auth-switch">
+                    Or <a id="continueAnonymously2">continue anonymously</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact link -->
+    <a href="https://www.facebook.com/NativeEritrean" target="_blank" id="contactUsLink">Contact Us</a>
 
     <!-- Firebase SDK -->
     <script type="module">
+        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, set, query, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, set, query, get, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            onAuthStateChanged, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDyOgYzDMZdo5V21T8fgHTvPhfgIavuxBA",
             authDomain: "kunama-academy-data.firebaseapp.com",
@@ -22,10 +1014,358 @@
             appId: "1:1089407925060:web:260a1f597ed520fc977511"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
+        
+        // Authentication state
+        let currentUser = null;
+        let isAnonymous = true;
 
-        // Function to update the progress bar based on total submission count
+        // User authentication management
+        function setupAuthentication() {
+            // Auth state changes
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in
+                    currentUser = user;
+                    isAnonymous = user.isAnonymous;
+                    console.log("User is signed in with ID:", user.uid);
+                    
+                    // Store the user ID as contributor ID
+                    localStorage.setItem("kunama_contributor_id", user.uid);
+                    
+                    // Update UI for authenticated user
+                    updateAuthUI();
+                } else {
+                    // User is signed out
+                    console.log("User is signed out");
+                    currentUser = null;
+                    isAnonymous = true;
+                    
+                    // Update UI for signed out user
+                    updateAuthUI();
+                }
+            });
+            
+            // Add click event to user menu button
+            document.getElementById('userMenuBtn').addEventListener('click', () => {
+                if (currentUser) {
+                    // Show profile section
+                    toggleProfileSection();
+                } else {
+                    // Show auth modal
+                    showAuthModal();
+                }
+            });
+            
+            // Setup auth modal
+            setupAuthModal();
+            
+            // Setup profile section
+            setupProfileSection();
+        }
+        
+        // Update UI based on authentication state
+        function updateAuthUI() {
+            const userNameElement = document.getElementById('userName');
+            const userIconElement = document.getElementById('userIcon');
+            
+            if (currentUser) {
+                // Get display name from different sources in order of preference
+                let displayName = getDisplayName();
+                
+                // Update user menu
+                userNameElement.textContent = displayName;
+                userIconElement.textContent = '👤';
+                
+                // Update profile section
+                document.getElementById('profileName').textContent = displayName;
+                document.getElementById('profileEmail').textContent = currentUser.email || 'Anonymous User';
+                document.getElementById('profileAvatar').textContent = getInitials(displayName);
+                document.getElementById('displayNameInput').value = displayName;
+            } else {
+                // Update for non-authenticated user
+                userNameElement.textContent = 'Sign in';
+                userIconElement.textContent = '👤';
+                
+                // Hide profile section if it's open
+                document.getElementById('userProfileSection').style.display = 'none';
+            }
+        }
+        
+        // Toggle profile section visibility
+        function toggleProfileSection() {
+            const profileSection = document.getElementById('userProfileSection');
+            
+            if (profileSection.style.display === 'none' || !profileSection.style.display) {
+                profileSection.style.display = 'block';
+            } else {
+                profileSection.style.display = 'none';
+            }
+        }
+        
+        // Get display name from various sources
+        function getDisplayName() {
+            // Order of preference: 
+            // 1. Custom display name in localStorage
+            // 2. Firebase auth display name
+            // 3. Email username
+            // 4. "Anonymous User"
+            const storedName = localStorage.getItem('kunama_display_name');
+            
+            if (storedName) {
+                return storedName;
+            } else if (currentUser && currentUser.displayName) {
+                return currentUser.displayName;
+            } else if (currentUser && currentUser.email) {
+                return currentUser.email.split('@')[0];
+            } else {
+                return 'Anonymous User';
+            }
+        }
+        
+        // Get initials from name for avatar
+        function getInitials(name) {
+            if (!name || name === 'Anonymous User') return '?';
+            
+            const parts = name.split(' ');
+            if (parts.length === 1) {
+                return name.charAt(0).toUpperCase();
+            } else {
+                return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+            }
+        }
+        
+        // Setup auth modal
+        function setupAuthModal() {
+            // Tab switching
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab + 'Form').classList.add('active');
+                });
+            });
+            
+            // Switch between forms
+            document.getElementById('switchToSignup').addEventListener('click', () => {
+                document.querySelector('.auth-tab[data-tab="signup"]').click();
+            });
+            
+            document.getElementById('switchToSignin').addEventListener('click', () => {
+                document.querySelector('.auth-tab[data-tab="signin"]').click();
+            });
+            
+            // Continue anonymously
+            document.getElementById('continueAnonymously').addEventListener('click', () => {
+                signInAnonymously(auth)
+                    .then(() => {
+                        hideAuthModal();
+                        showNotification('Continuing anonymously');
+                    })
+                    .catch(error => {
+                        console.error('Error signing in anonymously:', error);
+                        showNotification('Failed to sign in anonymously', 'error');
+                    });
+            });
+            
+            document.getElementById('continueAnonymously2').addEventListener('click', () => {
+                signInAnonymously(auth)
+                    .then(() => {
+                        hideAuthModal();
+                        showNotification('Continuing anonymously');
+                    })
+                    .catch(error => {
+                        console.error('Error signing in anonymously:', error);
+                        showNotification('Failed to sign in anonymously', 'error');
+                    });
+            });
+            
+            // Sign in
+            document.getElementById('signinBtn').addEventListener('click', () => {
+                const email = document.getElementById('signinEmail').value;
+                const password = document.getElementById('signinPassword').value;
+                
+                if (!email || !password) {
+                    showNotification('Please enter both email and password', 'error');
+                    return;
+                }
+                
+                signInWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        hideAuthModal();
+                        showNotification('Signed in successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error signing in:', error);
+                        showNotification('Failed to sign in: ' + error.message, 'error');
+                    });
+            });
+            
+            // Sign up
+            document.getElementById('signupBtn').addEventListener('click', () => {
+                const name = document.getElementById('signupName').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                
+                if (!name || !email || !password) {
+                    showNotification('Please fill in all fields', 'error');
+                    return;
+                }
+                
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(userCredential => {
+                        // Set display name
+                        updateProfile(userCredential.user, {
+                            displayName: name
+                        }).then(() => {
+                            // Also save to localStorage
+                            localStorage.setItem('kunama_display_name', name);
+                            
+                            hideAuthModal();
+                            showNotification('Account created successfully');
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error signing up:', error);
+                        showNotification('Failed to create account: ' + error.message, 'error');
+                    });
+            });
+        }
+        
+        // Setup profile section
+        function setupProfileSection() {
+            // Save profile button
+            document.getElementById('saveProfileBtn').addEventListener('click', () => {
+                const displayName = document.getElementById('displayNameInput').value;
+                
+                if (!displayName) {
+                    showNotification('Please enter a display name', 'error');
+                    return;
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('kunama_display_name', displayName);
+                
+                // If user is authenticated (not anonymous), update profile in Firebase
+                if (currentUser && !isAnonymous) {
+                    updateProfile(currentUser, {
+                        displayName: displayName
+                    }).then(() => {
+                        updateAuthUI();
+                        showNotification('Profile saved successfully');
+                    }).catch(error => {
+                        console.error('Error updating profile:', error);
+                        // Still update local UI since we saved to localStorage
+                        updateAuthUI();
+                        showNotification('Profile saved locally');
+                    });
+                } else {
+                    // Just update the UI for anonymous users
+                    updateAuthUI();
+                    showNotification('Profile saved locally');
+                }
+            });
+            
+            // Sign out button
+            document.getElementById('signOutBtn').addEventListener('click', () => {
+                signOut(auth).then(() => {
+                    showNotification('Signed out successfully');
+                    
+                    // Create a placeholder anonymous user for app functionality
+                    const contributorId = "anonymous_" + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem("kunama_contributor_id", contributorId);
+                    updateAuthUI();
+                }).catch(error => {
+                    console.error('Error signing out:', error);
+                    showNotification('Failed to sign out', 'error');
+                });
+            });
+        }
+        
+        // Show auth modal
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+        }
+        
+        // Hide auth modal
+        function hideAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+            
+            // Clear inputs
+            document.getElementById('signinEmail').value = '';
+            document.getElementById('signinPassword').value = '';
+            document.getElementById('signupName').value = '';
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupPassword').value = '';
+        }
+
+        // Utility functions
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str
+                .toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function formatRelativeTime(timestamp) {
+            if (!timestamp) return "Recently";
+            
+            const now = new Date();
+            const date = new Date(timestamp);
+            const diffSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffSeconds < 60) return "Just now";
+            if (diffSeconds < 3600) return `${Math.floor(diffSeconds / 60)} minutes ago`;
+            if (diffSeconds < 86400) return `${Math.floor(diffSeconds / 3600)} hours ago`;
+            if (diffSeconds < 604800) return `${Math.floor(diffSeconds / 86400)} days ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function showNotification(message, type = "success") {
+            const notification = document.createElement("div");
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Fade in
+            setTimeout(() => {
+                notification.style.opacity = "1";
+                notification.style.transform = "translateY(0)";
+            }, 10);
+            
+            // Fade out and remove
+            setTimeout(() => {
+                notification.style.opacity = "0";
+                notification.style.transform = "translateY(-20px)";
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 2000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification("Copied to clipboard!");
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+                showNotification("Copy failed", "error");
+            });
+        }
+
+        // Progress bar functionality
         function updateProgressBar() {
             const goal = 5000; // Total goal of submissions
             const submissionCountRef = ref(db, 'submission_count');  // Reference to 'submission_count'
@@ -43,24 +1383,159 @@
             });
         }
 
-        // Function to add a new phrase to Firebase (pending for approval)
-        function addNewPhraseToFirebase(phrase, translation, contributor) {
-            const newSubmissionsRef = ref(db, 'pending_submissions');
-            const newPhraseRef = push(newSubmissionsRef);
+        // Character counter functionality
+        function setupCharacterCounters() {
+            const inputFields = [
+                { input: document.getElementById("newPhrase"), counter: "phraseCounter", limit: 200 },
+                { input: document.getElementById("newTranslation"), counter: "translationCounter", limit: 200 }
+            ];
             
-            // Create submission object with contributor name if provided
-            const submissionData = { 
-                phrase, 
-                translation, 
-                timestamp: new Date().toISOString()
-            };
+            // Create counter elements if they don't exist
+            inputFields.forEach(field => {
+                const counterEl = document.createElement("span");
+                counterEl.id = field.counter;
+                counterEl.className = "char-counter";
+                field.input.parentNode.insertBefore(counterEl, field.input.nextSibling);
+                
+                // Initial count
+                updateCounter(field.input, counterEl, field.limit);
+                
+                // Add event listener for input changes
+                field.input.addEventListener("input", () => {
+                    updateCounter(field.input, counterEl, field.limit);
+                });
+            });
+        }
+
+        // Update counter display
+        function updateCounter(inputElement, counterElement, limit) {
+            const currentLength = inputElement.value.length;
+            counterElement.textContent = `${currentLength}/${limit}`;
             
-            // Only add contributor field if a name was provided
-            if (contributor && contributor.trim() !== "") {
-                submissionData.contributor = contributor.trim();
+            // Visual feedback for approaching limit
+            if (currentLength > limit * 0.8) {
+                counterElement.style.color = "#ff9800";
+            } else {
+                counterElement.style.color = "#777";
             }
             
-            set(newPhraseRef, submissionData).then(() => {
+            // Visual feedback for exceeding limit
+            if (currentLength > limit) {
+                counterElement.style.color = "#f44336";
+            }
+        }
+
+        // Auto-save functionality
+        function setupAutoSave() {
+            const inputFields = [
+                { id: "newPhrase", storageKey: "kunama_autosave_phrase" },
+                { id: "newTranslation", storageKey: "kunama_autosave_translation" },
+                { id: "newCategory", storageKey: "kunama_autosave_category" }
+            ];
+            
+            // Load saved data on page load
+            inputFields.forEach(field => {
+                const savedValue = localStorage.getItem(field.storageKey);
+                if (savedValue) {
+                    document.getElementById(field.id).value = savedValue;
+                }
+                
+                // Set up auto-save on input
+                document.getElementById(field.id).addEventListener("input", (e) => {
+                    localStorage.setItem(field.storageKey, e.target.value);
+                    showAutoSaveIndicator();
+                });
+            });
+        }
+
+        function showAutoSaveIndicator() {
+            // Create or update autosave indicator
+            let indicator = document.getElementById("autosaveIndicator");
+            if (!indicator) {
+                indicator = document.createElement("span");
+                indicator.id = "autosaveIndicator";
+                indicator.className = "autosave-indicator";
+                document.getElementById("addFormContainer").appendChild(indicator);
+            }
+            
+            // Show saving message
+            indicator.innerHTML = "Auto-saving...";
+            indicator.style.opacity = "1";
+            
+            // Hide message after delay
+            setTimeout(() => {
+                indicator.innerHTML = "Saved";
+                setTimeout(() => {
+                    indicator.style.opacity = "0";
+                }, 800);
+            }, 700);
+        }
+
+        // Clear saved data after successful submission
+        function clearAutoSavedData() {
+            localStorage.removeItem("kunama_autosave_phrase");
+            localStorage.removeItem("kunama_autosave_translation");
+            localStorage.removeItem("kunama_autosave_category");
+        }
+
+        // Confirmation dialog for submission
+        function confirmSubmission(phrase, translation, category, onConfirm) {
+            // Create modal elements
+            const modalOverlay = document.createElement("div");
+            modalOverlay.className = "modal-overlay";
+            
+            const modalContent = document.createElement("div");
+            modalContent.className = "modal-content";
+            
+            // Add content to modal
+            modalContent.innerHTML = `
+                <h3>Confirm Submission</h3>
+                <p>Are you sure you want to submit the following translation?</p>
+                <div class="confirm-details">
+                    <p><strong>English:</strong> ${escapeHTML(phrase)}</p>
+                    <p><strong>Kunama:</strong> ${escapeHTML(translation)}</p>
+                    ${category ? `<p><strong>Category:</strong> ${escapeHTML(category)}</p>` : ''}
+                </div>
+                <div class="confirm-buttons">
+                    <button id="confirmCancel" class="button button-secondary">Cancel</button>
+                    <button id="confirmSubmit" class="button">Submit</button>
+                </div>
+            `;
+            
+            // Add modal to page
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+            
+            // Handle buttons
+            document.getElementById("confirmCancel").addEventListener("click", () => {
+                document.body.removeChild(modalOverlay);
+            });
+            
+            document.getElementById("confirmSubmit").addEventListener("click", () => {
+                document.body.removeChild(modalOverlay);
+                onConfirm();
+            });
+        }
+
+        // Add new phrase to Firebase with contributor name
+        function addNewPhraseToFirebase(phrase, translation, category = "") {
+            // Get contributor ID from Firebase Auth or generate a temporary one
+            const contributorId = currentUser ? currentUser.uid : "anonymous_" + Math.random().toString(36).substr(2, 9);
+            
+            // Get contributor name from various sources
+            const contributorName = getDisplayName();
+            
+            // Save contribution information
+            const newSubmissionsRef = ref(db, 'pending_submissions');
+            const newPhraseRef = push(newSubmissionsRef);
+            set(newPhraseRef, { 
+                phrase, 
+                translation,
+                category, 
+                timestamp: new Date().toISOString(),
+                contributorId: contributorId,
+                contributorName: contributorName
+            }).then(() => {
                 // Increment the submission count
                 const submissionCountRef = ref(db, 'submission_count');
                 get(submissionCountRef).then((snapshot) => {
@@ -79,34 +1554,665 @@
                     console.error("Error fetching submission count:", error);
                 });
 
-                document.getElementById("statusMessage").innerText = "✅ Phrase submitted, waiting for approval!";
+                document.getElementById("statusMessage").innerText = "✅ Added, waiting for approval!";
                 document.getElementById("newPhrase").value = "";  
                 document.getElementById("newTranslation").value = "";
-                document.getElementById("contributorName").value = "";
+                document.getElementById("newCategory").value = "";
+                
+                // Clear auto-saved data after successful submission
+                clearAutoSavedData();
 
                 // Update the progress bar after successful submission
                 updateProgressBar();
+                
+                // Update contributor leaderboard
+                fetchContributorLeaderboard();
+
+                // Show success notification
+                showNotification("Translation submitted successfully!", "success");
 
                 setTimeout(() => {
                     document.getElementById("statusMessage").innerText = "";
                 }, 3000);  // Clear the status message after 3 seconds
             }).catch((error) => {
                 document.getElementById("statusMessage").innerText = "❌ Error: " + error.message;
+                showNotification("Error submitting translation", "error");
             });
         }
 
+        // Recent translations display
+        function fetchRecentTranslations() {
+            const recentContainer = document.getElementById("recentTranslations");
+            const approvedPhrasesRef = ref(db, 'approved_phrases');
+            
+            // Query to get the 5 most recent approved phrases
+            const recentQuery = query(approvedPhrasesRef, orderByChild('timestamp'), limitToLast(5));
+            
+            get(recentQuery).then((snapshot) => {
+                recentContainer.innerHTML = "<h3>Recently Added</h3>";
+                
+                if (snapshot.exists()) {
+                    // Convert to array and reverse to get newest first
+                    const entries = [];
+                    snapshot.forEach(childSnapshot => {
+                        entries.push({
+                            id: childSnapshot.key,
+                            ...childSnapshot.val()
+                        });
+                    });
+                    
+                    // Sort by timestamp (newest first) and take the top 3
+                    entries.sort((a, b) => {
+                        return new Date(b.timestamp || 0) - new Date(a.timestamp || 0);
+                    }).slice(0, 3).forEach(entry => {
+                        const entryElement = document.createElement("div");
+                        entryElement.className = "recent-item";
+                        entryElement.innerHTML = `
+                            <p><strong>${escapeHTML(entry.phrase)}</strong> → ${escapeHTML(entry.translation)}</p>
+                            <span class="recent-date">${formatRelativeTime(entry.timestamp)}</span>
+                        `;
+                        recentContainer.appendChild(entryElement);
+                    });
+                } else {
+                    recentContainer.innerHTML += "<p>No recent translations available.</p>";
+                }
+            }).catch((error) => {
+                console.error("Error fetching recent translations:", error);
+                recentContainer.innerHTML += "<p>❌ Error loading recent translations.</p>";
+            });
+        }
+
+        // Contributor leaderboard - filtering out system/admin contributions
+        function fetchContributorLeaderboard() {
+            const leaderboardContainer = document.getElementById("contributorLeaderboard");
+            const submissionsRef = ref(db, 'approved_phrases');
+            
+            get(submissionsRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    // Count contributions by contributor ID/name
+                    const contributors = {};
+                    
+                    // System IDs to exclude from leaderboard
+                    const systemIds = [
+                        'system', 'admin', 'bot', 'initialize', 'initial',
+                        'admin_user', 'administrator', 'init_data', 'migration'
+                    ];
+                    
+                    snapshot.forEach(childSnapshot => {
+                        const data = childSnapshot.val();
+                        
+                        // Get contributor name or ID
+                        const contributorName = data.contributorName || data.contributor || "Anonymous";
+                        const contributorId = data.contributorId || "";
+                        
+                        // Skip system/admin/initial contributions
+                        if (systemIds.some(id => 
+                            contributorId.toLowerCase().includes(id) || 
+                            contributorName.toLowerCase().includes(id)
+                        )) {
+                            return; // Skip this iteration
+                        }
+                        
+                        // Skip entries without timestamp (likely initial data)
+                        if (!data.timestamp) {
+                            return; // Skip this iteration
+                        }
+                        
+                        // Track contributions
+                        if (!contributors[contributorName]) {
+                            contributors[contributorName] = 0;
+                        }
+                        
+                        contributors[contributorName]++;
+                    });
+                    
+                    // Convert to array and sort
+                    const sortedContributors = Object.entries(contributors)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 10); // Top 10 contributors
+                    
+                    // Display leaderboard
+                    leaderboardContainer.innerHTML = "<h3>Top Contributors</h3>";
+                    
+                    if (sortedContributors.length > 0) {
+                        const leaderboardList = document.createElement("ol");
+                        leaderboardList.className = "leaderboard-list";
+                        
+                        sortedContributors.forEach(([name, count], index) => {
+                            const listItem = document.createElement("li");
+                            let medal = "";
+                            
+                            // Add medals for top 3
+                            if (index === 0) medal = "🥇 ";
+                            else if (index === 1) medal = "🥈 ";
+                            else if (index === 2) medal = "🥉 ";
+                            
+                            listItem.innerHTML = `
+                                <span class="contributor-name">${medal}${escapeHTML(name)}</span>
+                                <span class="contribution-count">${count} translation${count !== 1 ? 's' : ''}</span>
+                            `;
+                            
+                            leaderboardList.appendChild(listItem);
+                        });
+                        
+                        leaderboardContainer.appendChild(leaderboardList);
+                    } else {
+                        leaderboardContainer.innerHTML += "<p>No user contributions yet. Be the first!</p>";
+                    }
+                } else {
+                    leaderboardContainer.innerHTML = "<h3>Top Contributors</h3><p>No contributors yet.</p>";
+                }
+            }).catch((error) => {
+                console.error("Error fetching contributor data:", error);
+                leaderboardContainer.innerHTML = "<h3>Top Contributors</h3><p>❌ Error loading contributor data.</p>";
+            });
+        }
+
+        // Voting system functionality
+        function handleVote(phraseId, voteType) {
+            console.log(`Processing vote: ${voteType} for phrase ID: ${phraseId}`);
+            
+            // Reference to the votes in the database
+            const voteRef = ref(db, `votes/${phraseId}`);
+            
+            // Get current vote counts
+            get(voteRef).then((snapshot) => {
+                let upvotes = 0;
+                let downvotes = 0;
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    upvotes = data.upvotes || 0;
+                    downvotes = data.downvotes || 0;
+                    console.log(`Current votes - Up: ${upvotes}, Down: ${downvotes}`);
+                }
+                
+                // Update votes based on vote type
+                if (voteType === 'up') {
+                    upvotes++;
+                } else if (voteType === 'down') {
+                    downvotes++;
+                }
+                
+                console.log(`Updating to - Up: ${upvotes}, Down: ${downvotes}`);
+                
+                // Save updated votes
+                set(voteRef, {
+                    upvotes,
+                    downvotes,
+                    score: upvotes - downvotes,
+                    timestamp: new Date().toISOString()
+                }).then(() => {
+                    console.log("Vote saved successfully");
+                    
+                    // Update UI immediately
+                    updateVoteDisplay(phraseId, upvotes, downvotes);
+                    
+                    // Save voted items to localStorage to prevent duplicate votes
+                    saveVoteToLocalStorage(phraseId);
+                    
+                    // Show notification
+                    showNotification("Vote recorded!", "success");
+                }).catch((error) => {
+                    console.error("Error updating votes:", error);
+                    showNotification("Error recording vote", "error");
+                });
+            }).catch((error) => {
+                console.error("Error fetching votes:", error);
+                showNotification("Error fetching votes", "error");
+            });
+        }
+
+        // Add vote buttons to search results
+        function addVoteButtons(resultItem, phraseId) {
+            console.log(`Adding vote buttons for phrase ID: ${phraseId}`);
+            
+            // Create vote container
+            const voteContainer = document.createElement("div");
+            voteContainer.className = "vote-container";
+            voteContainer.innerHTML = `
+                <span class="vote-label">Helpful?</span>
+                <button class="vote-button upvote" data-id="${phraseId}">👍 <span class="vote-count">0</span></button>
+                <button class="vote-button downvote" data-id="${phraseId}">👎 <span class="vote-count">0</span></button>
+            `;
+            
+            // Append to result item
+            resultItem.appendChild(voteContainer);
+            
+            // Add event listeners
+            voteContainer.querySelector(".upvote").addEventListener("click", (e) => {
+                if (!hasVoted(phraseId)) {
+                    handleVote(phraseId, 'up');
+                } else {
+                    showVoteMessage(e.target, "You've already voted");
+                }
+            });
+            
+            voteContainer.querySelector(".downvote").addEventListener("click", (e) => {
+                if (!hasVoted(phraseId)) {
+                    handleVote(phraseId, 'down');
+                } else {
+                    showVoteMessage(e.target, "You've already voted");
+                }
+            });
+            
+            // Load current votes
+            loadVotes(phraseId);
+        }
+
+        // Load current votes from Firebase
+        function loadVotes(phraseId) {
+            const voteRef = ref(db, `votes/${phraseId}`);
+            get(voteRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    updateVoteDisplay(phraseId, data.upvotes || 0, data.downvotes || 0);
+                }
+            }).catch((error) => {
+                console.error("Error loading votes:", error);
+            });
+        }
+
+        // Update vote display
+        function updateVoteDisplay(phraseId, upvotes, downvotes) {
+            const resultItem = document.querySelector(`.result-item[data-id="${phraseId}"]`);
+            if (resultItem) {
+                resultItem.querySelector(".upvote .vote-count").textContent = upvotes;
+                resultItem.querySelector(".downvote .vote-count").textContent = downvotes;
+            }
+        }
+
+        // Save voted items to localStorage
+        function saveVoteToLocalStorage(phraseId) {
+            const votedItems = JSON.parse(localStorage.getItem("kunama_voted_items") || "[]");
+            if (!votedItems.includes(phraseId)) {
+                votedItems.push(phraseId);
+                localStorage.setItem("kunama_voted_items", JSON.stringify(votedItems));
+            }
+        }
+
+        // Check if user has already voted
+        function hasVoted(phraseId) {
+            const votedItems = JSON.parse(localStorage.getItem("kunama_voted_items") || "[]");
+            return votedItems.includes(phraseId);
+        }
+
+        // Show vote message
+        function showVoteMessage(element, message) {
+            const messageEl = document.createElement("span");
+            messageEl.className = "vote-message";
+            messageEl.textContent = message;
+            
+            element.parentNode.appendChild(messageEl);
+            
+            setTimeout(() => {
+                messageEl.remove();
+            }, 2000);
+        }
+
+        // Text-to-speech functionality
+        function setupTextToSpeech() {
+            // Check if browser supports speech synthesis
+            if ('speechSynthesis' in window) {
+                console.log("Text-to-speech is supported in this browser");
+            } else {
+                console.log("Text-to-speech is not supported in this browser");
+            }
+        }
+
+        // Function to speak text using the Web Speech API
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                
+                // Create a new speech utterance
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Set language based on content
+                // Try to detect if it's English or Kunama by checking for common English words
+                const commonEnglishWords = ["the", "is", "and", "to", "of", "a", "in", "that", "have", "it"];
+                const words = text.toLowerCase().split(/\s+/);
+                const containsEnglishWords = words.some(word => commonEnglishWords.includes(word));
+                
+                // Set language based on detection
+                utterance.lang = containsEnglishWords ? 'en-US' : 'und'; // 'und' for undefined/unknown language
+                
+                // Get available voices
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    // Try to find an appropriate voice
+                    if (containsEnglishWords) {
+                        // Find an English voice
+                        const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+                        if (englishVoice) utterance.voice = englishVoice;
+                    }
+                }
+                
+                // Speak the utterance
+                window.speechSynthesis.speak(utterance);
+                
+                // Show notification
+                showNotification("Playing audio...");
+            } else {
+                showNotification("Text-to-speech is not supported in your browser", "error");
+            }
+        }
+
+        // Client-side caching
+        function setupCaching() {
+            // Create an in-memory cache for search results
+            window.kunamaCache = {
+                searchResults: {},
+                maxCacheSize: 20,
+                
+                // Add results to cache
+                addToCache: function(searchTerm, results) {
+                    // Only cache if we have results and it's not a super short query
+                    if (results.length > 0 && searchTerm.length >= 3) {
+                        this.searchResults[searchTerm.toLowerCase()] = {
+                            results: results,
+                            timestamp: Date.now()
+                        };
+                        
+                        // Prune cache if it's too large
+                        this.pruneCache();
+                    }
+                },
+                
+                // Get results from cache
+                getFromCache: function(searchTerm) {
+                    const cacheEntry = this.searchResults[searchTerm.toLowerCase()];
+                    if (cacheEntry) {
+                        // Check if cache is still fresh (less than 5 minutes old)
+                        const isFresh = (Date.now() - cacheEntry.timestamp) < (5 * 60 * 1000);
+                        if (isFresh) {
+                            return cacheEntry.results;
+                        } else {
+                            // Remove stale entry
+                            delete this.searchResults[searchTerm.toLowerCase()];
+                        }
+                    }
+                    return null;
+                },
+                
+                // Prune cache when it gets too big
+                pruneCache: function() {
+                    const keys = Object.keys(this.searchResults);
+                    if (keys.length > this.maxCacheSize) {
+                        // Sort by timestamp (oldest first)
+                        keys.sort((a, b) => {
+                            return this.searchResults[a].timestamp - this.searchResults[b].timestamp;
+                        });
+                        
+                        // Remove oldest entries
+                        const keysToRemove = keys.slice(0, keys.length - this.maxCacheSize);
+                        keysToRemove.forEach(key => {
+                            delete this.searchResults[key];
+                        });
+                    }
+                },
+                
+                // Clear the entire cache
+                clearCache: function() {
+                    this.searchResults = {};
+                }
+            };
+        }
+
+        // Dark mode functionality
+        function setupDarkMode() {
+            // Create dark mode toggle button
+            const darkModeToggle = document.createElement("button");
+            darkModeToggle.id = "darkModeToggle";
+            darkModeToggle.className = "dark-mode-toggle";
+            darkModeToggle.title = "Toggle Dark Mode";
+            darkModeToggle.innerHTML = "🌓";
+            
+            // Add to page
+            document.querySelector(".container").appendChild(darkModeToggle);
+            
+            // Check for saved preference
+            const darkModeEnabled = localStorage.getItem("kunama_dark_mode") === "true";
+            if (darkModeEnabled) {
+                document.body.classList.add("dark-mode");
+            }
+            
+            // Toggle dark mode
+            darkModeToggle.addEventListener("click", () => {
+                document.body.classList.toggle("dark-mode");
+                const isDarkMode = document.body.classList.contains("dark-mode");
+                localStorage.setItem("kunama_dark_mode", isDarkMode);
+            });
+        }
+
+        // Search filters functionality
+        function setupSearchFilters() {
+            // Create filter container
+            const filterContainer = document.createElement("div");
+            filterContainer.id = "searchFilterContainer";
+            filterContainer.className = "search-filter-container";
+            
+            // Add filter options
+            filterContainer.innerHTML = `
+                <button id="toggleFilters" class="filter-toggle">🔍 Filters</button>
+                <div id="filterOptions" class="filter-options">
+                    <div class="filter-group">
+                        <label>Category:</label>
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                            <option value="greetings">Greetings</option>
+                            <option value="food">Food</option>
+                            <option value="family">Family</option>
+                            <option value="numbers">Numbers</option>
+                            <option value="common">Common Phrases</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By:</label>
+                        <select id="sortFilter">
+                            <option value="relevance">Relevance</option>
+                            <option value="newest">Newest First</option>
+                            <option value="votes">Highest Rated</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Search In:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="searchEnglish" checked> English</label>
+                            <label><input type="checkbox" id="searchKunama" checked> Kunama</label>
+                        </div>
+                    </div>
+                    <button id="applyFilters" class="button button-small">Apply Filters</button>
+                </div>
+            `;
+            
+            // Insert after search input
+            const searchInput = document.getElementById("searchInput");
+            searchInput.parentNode.insertBefore(filterContainer, searchInput.nextSibling);
+            
+            // Toggle filter options visibility
+            document.getElementById("toggleFilters").addEventListener("click", () => {
+                const filterOptions = document.getElementById("filterOptions");
+                filterOptions.style.display = filterOptions.style.display === "block" ? "none" : "block";
+            });
+            
+            // Apply filters button
+            document.getElementById("applyFilters").addEventListener("click", () => {
+                const searchTerm = document.getElementById("searchInput").value;
+                if (searchTerm) {
+                    searchPhraseWithFilters(searchTerm);
+                }
+                document.getElementById("filterOptions").style.display = "none";
+            });
+        }
+
+        // Search history functionality
+        function setupSearchHistory() {
+            // Create history button
+            const historyButton = document.createElement("button");
+            historyButton.id = "searchHistoryButton";
+            historyButton.className = "history-button";
+            historyButton.title = "Search History";
+            historyButton.innerHTML = "📜";
+            
+            // Create history container
+            const historyContainer = document.createElement("div");
+            historyContainer.id = "searchHistoryContainer";
+            historyContainer.className = "search-history-container";
+            historyContainer.style.display = "none";
+            
+            // Add elements to page
+            const searchInput = document.getElementById("searchInput");
+            searchInput.parentNode.insertBefore(historyButton, searchInput.nextSibling);
+            searchInput.parentNode.insertBefore(historyContainer, historyButton.nextSibling);
+            
+            // Toggle history visibility
+            historyButton.addEventListener("click", () => {
+                if (historyContainer.style.display === "none") {
+                    displaySearchHistory();
+                    historyContainer.style.display = "block";
+                } else {
+                    historyContainer.style.display = "none";
+                }
+            });
+        }
+
+        // Function to save search to history
+        function saveSearchToHistory(searchTerm) {
+            // Don't save empty searches
+            if (!searchTerm.trim()) return;
+            
+            // Get existing history
+            let searchHistory = JSON.parse(localStorage.getItem("kunama_search_history") || "[]");
+            
+            // Check if search term already exists in history
+            const existingIndex = searchHistory.indexOf(searchTerm);
+            if (existingIndex !== -1) {
+                // Remove existing entry to move it to top
+                searchHistory.splice(existingIndex, 1);
+            }
+            
+            // Add to beginning of array
+            searchHistory.unshift(searchTerm);
+            
+            // Limit to 10 items
+            searchHistory = searchHistory.slice(0, 10);
+            
+            // Save back to localStorage
+            localStorage.setItem("kunama_search_history", JSON.stringify(searchHistory));
+            
+            // Update UI if history drawer is open
+            if (document.getElementById("searchHistoryContainer") && 
+                document.getElementById("searchHistoryContainer").style.display === "block") {
+                displaySearchHistory();
+            }
+        }
+
+        // Function to display search history
+        function displaySearchHistory() {
+            const historyContainer = document.getElementById("searchHistoryContainer");
+            const searchHistory = JSON.parse(localStorage.getItem("kunama_search_history") || "[]");
+            
+            if (searchHistory.length === 0) {
+                historyContainer.innerHTML = "<p>No search history</p>";
+                return;
+            }
+            
+            const historyList = document.createElement("ul");
+            historyList.className = "search-history-list";
+            
+            searchHistory.forEach(term => {
+                const listItem = document.createElement("li");
+                listItem.className = "history-item";
+                
+                // Create item content
+                const historyText = document.createElement("span");
+                historyText.textContent = term;
+                historyText.className = "history-text";
+                
+                const historyActions = document.createElement("div");
+                historyActions.className = "history-actions";
+                historyActions.innerHTML = `
+                    <button class="history-search" title="Search Again">🔍</button>
+                    <button class="history-delete" title="Remove">❌</button>
+                `;
+                
+                listItem.appendChild(historyText);
+                listItem.appendChild(historyActions);
+                historyList.appendChild(listItem);
+                
+                // Add event listeners
+                listItem.querySelector(".history-search").addEventListener("click", () => {
+                    document.getElementById("searchInput").value = term;
+                    searchPhraseWithFilters(term);
+                    historyContainer.style.display = "none";
+                });
+                
+                listItem.querySelector(".history-delete").addEventListener("click", () => {
+                    removeFromSearchHistory(term);
+                    listItem.remove();
+                    if (historyList.children.length === 0) {
+                        historyContainer.innerHTML = "<p>No search history</p>";
+                    }
+                });
+            });
+            
+            // Clear button
+            const clearButton = document.createElement("button");
+            clearButton.className = "button button-small";
+            clearButton.textContent = "Clear History";
+            clearButton.addEventListener("click", () => {
+                clearSearchHistory();
+                historyContainer.innerHTML = "<p>No search history</p>";
+            });
+            
+            // Update container
+            historyContainer.innerHTML = "";
+            historyContainer.appendChild(historyList);
+            historyContainer.appendChild(clearButton);
+        }
+
+        // Function to remove item from search history
+        function removeFromSearchHistory(term) {
+            const searchHistory = JSON.parse(localStorage.getItem("kunama_search_history") || "[]");
+            const index = searchHistory.indexOf(term);
+            
+            if (index !== -1) {
+                searchHistory.splice(index, 1);
+                localStorage.setItem("kunama_search_history", JSON.stringify(searchHistory));
+            }
+        }
+
+        // Function to clear all search history
+        function clearSearchHistory() {
+            localStorage.removeItem("kunama_search_history");
+        }
+
+        // Search functionality
         let debounceTimer;
 
         async function searchPhraseInFirebase(searchTerm) {
             if (!searchTerm) {
                 document.getElementById("results").innerHTML = ""; // Clear results if no search term
-                return;
+                return [];
+            }
+
+            // Save search to history
+            saveSearchToHistory(searchTerm);
+            
+            // Check cache first
+            const cachedResults = window.kunamaCache ? window.kunamaCache.getFromCache(searchTerm) : null;
+            if (cachedResults) {
+                console.log("Using cached results for:", searchTerm);
+                const resultsContainer = document.getElementById("results");
+                resultsContainer.innerHTML = "";  // Clear previous results
+                displayResults(cachedResults, resultsContainer);
+                return cachedResults;
             }
 
             const approvedPhrasesRef = ref(db, 'approved_phrases');
-
             const searchTermLower = searchTerm.toLowerCase();
-            const maxResults = 3;  // Max results to return
 
             document.getElementById("results").innerHTML = "<p>Loading...</p>"; // Show loading indicator
 
@@ -124,6 +2230,8 @@
                 const processSnapshot = (snapshot) => {
                     snapshot.forEach((childSnapshot) => {
                         const entry = childSnapshot.val();
+                        entry.id = childSnapshot.key; // Store the database key
+                        
                         const phraseLower = entry.phrase.toLowerCase();
                         const translationLower = entry.translation.toLowerCase();
 
@@ -143,7 +2251,7 @@
                     processSnapshot(snapshotApproved);
                 }
 
-                // Combine exact and partial matches and sort them
+                // Combine exact and partial matches
                 const allResults = [...exactMatches, ...partialMatches];
 
                 // Sort results to prioritize exact matches
@@ -153,30 +2261,24 @@
                     return bIsExact - aIsExact; // Prioritize exact matches (true > false)
                 });
 
-                // Limit the results to maxResults
-                const limitedResults = allResults.slice(0, maxResults);
-
-                // Display results
-                if (limitedResults.length > 0) {
-                    limitedResults.forEach(entry => {
-                        // Check if entry has a contributor name
-                        const contributorInfo = entry.contributor ? 
-                            `<span class="contributor">Submitted by: ${entry.contributor}</span>` : 
-                            "";
-                            
-                        resultsContainer.innerHTML += ` 
-                            <div class="result-item">
-                                <p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
-                                ${contributorInfo}
-                            </div>
-                        `;
-                    });
-                } else {
-                    resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
+                // Cache these results
+                if (window.kunamaCache) {
+                    window.kunamaCache.addToCache(searchTerm, allResults);
                 }
+
+                // Display results with pagination
+                displayResults(allResults, resultsContainer);
+                
+                // Check for misspellings and suggest alternatives
+                if (allResults.length === 0) {
+                    suggestAlternatives(searchTerm, snapshotApproved);
+                }
+                
+                return allResults; // Return results for caching
             } catch (error) {
                 console.error("Error searching phrase:", error);
                 document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
+                return []; // Return empty array on error
             }
         }
 
@@ -184,208 +2286,445 @@
         function debounceSearch(event) {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
-                searchPhraseInFirebase(event.target.value);
+                const searchTerm = event.target.value;
+                if (searchTerm) {
+                    // Check if filters are active
+                    const hasActiveFilters = 
+                        document.getElementById("categoryFilter") && document.getElementById("categoryFilter").value !== "" ||
+                        document.getElementById("sortFilter") && document.getElementById("sortFilter").value !== "relevance" ||
+                        document.getElementById("searchEnglish") && !document.getElementById("searchEnglish").checked ||
+                        document.getElementById("searchKunama") && !document.getElementById("searchKunama").checked;
+                    
+                    if (hasActiveFilters) {
+                        searchPhraseWithFilters(searchTerm);
+                    } else {
+                        searchPhraseInFirebase(searchTerm);
+                    }
+                } else {
+                    document.getElementById("results").innerHTML = "";
+                }
             }, 300);  // Wait 300ms after the user stops typing
         }
 
-        // Event listener for the search input field
-        document.getElementById("searchInput").addEventListener("input", debounceSearch);
-
-        // Event listener for add new checkbox
-        document.getElementById("addNewCheckbox").addEventListener("change", function() {
-            document.getElementById("addFormContainer").style.display = this.checked ? "block" : "none";
-        });
-
-        // Event listener for add phrase button
-        document.getElementById("addPhraseButton").addEventListener("click", () => {
-            const phrase = document.getElementById("newPhrase").value.trim();
-            const translation = document.getElementById("newTranslation").value.trim();
-            const contributor = document.getElementById("contributorName").value.trim();
+        // "Did you mean" suggestions
+        function suggestAlternatives(searchTerm, snapshot) {
+            if (!snapshot.exists() || searchTerm.length < 3) return;
             
-            if (phrase && translation) {
-                addNewPhraseToFirebase(phrase, translation, contributor);
-            } else {
-                document.getElementById("statusMessage").innerText = "❗ Please enter both phrase and translation.";
+            const searchTermLower = searchTerm.toLowerCase();
+            const allPhrases = [];
+            
+            // Collect all phrases
+            snapshot.forEach(childSnapshot => {
+                const entry = childSnapshot.val();
+                allPhrases.push(entry.phrase.toLowerCase());
+                allPhrases.push(entry.translation.toLowerCase());
+            });
+            
+            // Find closest matches using Levenshtein distance
+            const suggestions = findClosestMatches(searchTermLower, allPhrases, 3);
+            
+            if (suggestions.length > 0) {
+                const suggestionsContainer = document.createElement("div");
+                suggestionsContainer.className = "search-suggestions";
+                suggestionsContainer.innerHTML = "<p>Did you mean:</p>";
+                
+                const suggestionList = document.createElement("ul");
+                
+                suggestions.forEach(suggestion => {
+                    const listItem = document.createElement("li");
+                    const suggestionLink = document.createElement("a");
+                    suggestionLink.href = "#";
+                    suggestionLink.textContent = suggestion;
+                    suggestionLink.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        document.getElementById("searchInput").value = suggestion;
+                        searchPhraseInFirebase(suggestion);
+                    });
+                    
+                    listItem.appendChild(suggestionLink);
+                    suggestionList.appendChild(listItem);
+                });
+                
+                suggestionsContainer.appendChild(suggestionList);
+                document.getElementById("results").appendChild(suggestionsContainer);
             }
-        });
+        }
 
-        // Call updateProgressBar on page load to set the initial progress
-        window.onload = updateProgressBar;
+        // Find closest matches using Levenshtein distance
+        function findClosestMatches(searchTerm, phrases, maxResults = 3) {
+            // Calculate Levenshtein distance between two strings
+            function levenshteinDistance(a, b) {
+                if (a.length === 0) return b.length;
+                if (b.length === 0) return a.length;
+                
+                const matrix = [];
+                
+                // Initialize matrix
+                for (let i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
+                
+                for (let j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
+                
+                // Fill matrix
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        const cost = a[j - 1] === b[i - 1] ? 0 : 1;
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j] + 1,          // deletion
+                            matrix[i][j - 1] + 1,          // insertion
+                            matrix[i - 1][j - 1] + cost    // substitution
+                        );
+                    }
+                }
+                
+                return matrix[b.length][a.length];
+            }
+            
+            // Calculate distances and sort
+            const phraseDistances = phrases
+                .filter((phrase, index, self) => self.indexOf(phrase) === index) // Remove duplicates
+                .map(phrase => ({
+                    phrase,
+                    distance: levenshteinDistance(searchTerm, phrase)
+                }))
+                .sort((a, b) => a.distance - b.distance);
+            
+            // Return top matches that are reasonably close (distance less than half the length of search term)
+            const maxDistance = Math.max(2, Math.floor(searchTerm.length / 2));
+            return phraseDistances
+                .filter(item => item.distance <= maxDistance)
+                .slice(0, maxResults)
+                .map(item => item.phrase);
+        }
+
+        // Display search results - limited to 3 results with no pagination
+        function displayResults(results, container) {
+            if (results.length === 0) {
+                container.innerHTML = "<p>No matching phrases found.</p>";
+                return;
+            }
+            
+            // Clear container
+            container.innerHTML = "";
+            
+            // Limit to 3 results only
+            const limitedResults = results.slice(0, 3);
+            
+            // Display results
+            limitedResults.forEach(entry => {
+                const resultItem = document.createElement("div");
+                resultItem.className = "result-item";
+                resultItem.setAttribute("data-id", entry.id);
+                
+                // Format the result item
+                resultItem.innerHTML = `
+                    <div class="result-content">
+                        <p><strong>${escapeHTML(entry.phrase)}</strong> → ${escapeHTML(entry.translation)}</p>
+                        ${entry.category ? `<span class="category-tag">${escapeHTML(entry.category)}</span>` : ''}
+                    </div>
+                    <div class="result-actions">
+                        <button class="copy-button" title="Copy to Clipboard">📋</button>
+                    </div>
+                `;
+                
+                container.appendChild(resultItem);
+                
+                // Add event listener for copy button
+                resultItem.querySelector(".copy-button").addEventListener("click", () => {
+                    copyToClipboard(`${entry.phrase} - ${entry.translation}`);
+                });
+                
+                // Add text-to-speech button if supported
+                if ('speechSynthesis' in window) {
+                    const actionsContainer = resultItem.querySelector('.result-actions');
+                    
+                    // Add TTS button for phrase (English)
+                    const ttsButtonPhrase = document.createElement('button');
+                    ttsButtonPhrase.className = 'tts-button';
+                    ttsButtonPhrase.title = 'Speak English';
+                    ttsButtonPhrase.setAttribute('data-text', entry.phrase);
+                    ttsButtonPhrase.innerHTML = '🔊 EN';
+                    actionsContainer.appendChild(ttsButtonPhrase);
+                    
+                    // Add TTS button for translation (Kunama)
+                    const ttsButtonTrans = document.createElement('button');
+                    ttsButtonTrans.className = 'tts-button';
+                    ttsButtonTrans.title = 'Speak Kunama';
+                    ttsButtonTrans.setAttribute('data-text', entry.translation);
+                    ttsButtonTrans.innerHTML = '🔊 KU';
+                    actionsContainer.appendChild(ttsButtonTrans);
+                    
+                    // Add event listeners for TTS buttons
+                    ttsButtonPhrase.addEventListener('click', () => {
+                        speakText(entry.phrase);
+                    });
+                    
+                    ttsButtonTrans.addEventListener('click', () => {
+                        speakText(entry.translation);
+                    });
+                }
+                
+                // Add vote buttons
+                addVoteButtons(resultItem, entry.id);
+            });
+            
+            // Show total results count if more than 3 results exist
+            if (results.length > 3) {
+                const moreResultsMessage = document.createElement("p");
+                moreResultsMessage.style.marginTop = "10px";
+                moreResultsMessage.style.fontStyle = "italic";
+                moreResultsMessage.textContent = `Showing top 3 of ${results.length} matching results`;
+                container.appendChild(moreResultsMessage);
+            }
+        }
+
+        // Filtered search functionality
+        function searchPhraseWithFilters(searchTerm) {
+            // Save search to history
+            saveSearchToHistory(searchTerm);
+            
+            // Check cache first
+            const cachedResults = window.kunamaCache ? window.kunamaCache.getFromCache(searchTerm) : null;
+            if (cachedResults) {
+                console.log("Using cached results for:", searchTerm);
+                const resultsContainer = document.getElementById("results");
+                resultsContainer.innerHTML = "";  // Clear previous results
+                displayFilteredResults(cachedResults, resultsContainer);
+                return;
+            }
+            
+            // Get filter values
+            const category = document.getElementById("categoryFilter").value;
+            const sortBy = document.getElementById("sortFilter").value;
+            const searchEnglish = document.getElementById("searchEnglish").checked;
+            const searchKunama = document.getElementById("searchKunama").checked;
+            
+            const approvedPhrasesRef = ref(db, 'approved_phrases');
+            const searchTermLower = searchTerm.toLowerCase();
+            
+            document.getElementById("results").innerHTML = "<p>Loading...</p>";
+            
+            get(approvedPhrasesRef).then((snapshot) => {
+                const resultsContainer = document.getElementById("results");
+                resultsContainer.innerHTML = "";
+                
+                if (snapshot.exists()) {
+                    let results = [];
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const entry = childSnapshot.val();
+                        entry.id = childSnapshot.key; // Store the database key
+                        
+                        const phraseMatch = searchEnglish && entry.phrase.toLowerCase().includes(searchTermLower);
+                        const translationMatch = searchKunama && entry.translation.toLowerCase().includes(searchTermLower);
+                        
+                        // Category filter
+                        const categoryMatch = !category || entry.category === category;
+                        
+                        if ((phraseMatch || translationMatch) && categoryMatch) {
+                            results.push({
+                                ...entry,
+                                exactMatch: entry.phrase.toLowerCase() === searchTermLower || 
+                                           entry.translation.toLowerCase() === searchTermLower
+                            });
+                        }
+                    });
+                    
+                    // Cache these results
+                    if (window.kunamaCache) {
+                        window.kunamaCache.addToCache(searchTerm, results);
+                    }
+                    
+                    // Display results based on sort option
+                    displayFilteredResults(results, resultsContainer, sortBy);
+                    
+                    // Check for misspellings if no results
+                    if (results.length === 0) {
+                        suggestAlternatives(searchTerm, snapshot);
+                    }
+                } else {
+                    resultsContainer.innerHTML = "<p>No matching phrases found.</p>";
+                }
+            }).catch((error) => {
+                console.error("Error searching phrase:", error);
+                document.getElementById("results").innerHTML = "<p>❌ Error fetching data.</p>";
+            });
+        }
+
+        // Display filtered results based on sort option
+        function displayFilteredResults(results, container, sortBy = "relevance") {
+            // Sort results based on selected sorting method
+            switch (sortBy) {
+                case "newest":
+                    results.sort((a, b) => {
+                        return new Date(b.timestamp || 0) - new Date(a.timestamp || 0);
+                    });
+                    break;
+                case "votes":
+                    // This requires an additional fetch for each entry to get votes
+                    // We'll do this asynchronously
+                    const resultsWithScores = [];
+                    const fetchPromises = [];
+                    
+                    results.forEach(result => {
+                        const voteRef = ref(db, `votes/${result.id}`);
+                        
+                        // Create a promise for each vote fetch
+                        const fetchPromise = get(voteRef).then(snapshot => {
+                            const voteData = snapshot.exists() ? snapshot.val() : { score: 0 };
+                            resultsWithScores.push({
+                                ...result,
+                                score: voteData.score || 0
+                            });
+                        }).catch(() => {
+                            // If fetch fails, add with score 0
+                            resultsWithScores.push({
+                                ...result,
+                                score: 0
+                            });
+                        });
+                        
+                        fetchPromises.push(fetchPromise);
+                    });
+                    
+                    // Wait for all vote fetches to complete, then sort and display
+                    Promise.all(fetchPromises).then(() => {
+                        resultsWithScores.sort((a, b) => b.score - a.score);
+                        displayResults(resultsWithScores, container);
+                    });
+                    
+                    return; // Exit early as we're handling display in the Promise
+                case "relevance":
+                default:
+                    // Sort by exact match first, then by partial match
+                    results.sort((a, b) => {
+                        if (a.exactMatch && !b.exactMatch) return -1;
+                        if (!a.exactMatch && b.exactMatch) return 1;
+                        return 0;
+                    });
+            }
+            
+            // Display results
+            displayResults(results, container);
+        }
+
+        // Event listeners setup
+        function setupEventListeners() {
+            document.getElementById("searchInput").addEventListener("input", debounceSearch);
+
+            // Event listener for add new phrase checkbox
+            document.getElementById("addNewCheckbox").addEventListener("change", function() {
+                document.getElementById("addFormContainer").style.display = this.checked ? "block" : "none";
+            });
+
+            // Event listener for add phrase button
+            document.getElementById("addPhraseButton").addEventListener("click", () => {
+                const phrase = document.getElementById("newPhrase").value.trim();
+                const translation = document.getElementById("newTranslation").value.trim();
+                const category = document.getElementById("newCategory").value;
+                
+                if (phrase && translation) {
+                    confirmSubmission(phrase, translation, category, () => {
+                        addNewPhraseToFirebase(phrase, translation, category);
+                    });
+                } else {
+                    document.getElementById("statusMessage").innerText = "❗ Please enter both phrase and translation.";
+                }
+            });
+            
+            // Close auth modal when clicking outside
+            document.getElementById("authModal").addEventListener("click", (e) => {
+                if (e.target === document.getElementById("authModal")) {
+                    hideAuthModal();
+                }
+            });
+            
+            // Add keyboard event listener to close modals with Escape key
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                    // Hide auth modal
+                    if (document.getElementById("authModal").style.display === "flex") {
+                        hideAuthModal();
+                    }
+                    
+                    // Hide profile section
+                    if (document.getElementById("userProfileSection").style.display === "block") {
+                        document.getElementById("userProfileSection").style.display = "none";
+                    }
+                    
+                    // Hide filter options
+                    if (document.getElementById("filterOptions") && document.getElementById("filterOptions").style.display === "block") {
+                        document.getElementById("filterOptions").style.display = "none";
+                    }
+                    
+                    // Hide search history
+                    if (document.getElementById("searchHistoryContainer") && document.getElementById("searchHistoryContainer").style.display === "block") {
+                        document.getElementById("searchHistoryContainer").style.display = "none";
+                    }
+                }
+            });
+            
+            // Submit auth forms on Enter key
+            document.getElementById("signinPassword").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    document.getElementById("signinBtn").click();
+                }
+            });
+            
+            document.getElementById("signupPassword").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    document.getElementById("signupBtn").click();
+                }
+            });
+        }
+
+        // Initialize application
+        window.onload = function() {
+            try {
+                // Create a placeholder anonymous user ID for app functionality
+                if (!localStorage.getItem("kunama_contributor_id")) {
+                    const contributorId = "anonymous_" + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem("kunama_contributor_id", contributorId);
+                }
+                
+                // Setup base functionality
+                setupEventListeners();
+                updateProgressBar();
+                setupCharacterCounters();
+                setupAutoSave();
+                
+                // Setup enhanced features
+                setupSearchFilters();
+                setupSearchHistory();
+                setupDarkMode();
+                setupTextToSpeech();
+                setupCaching();
+                
+                // Fetch data
+                fetchRecentTranslations();
+                fetchContributorLeaderboard();
+                
+                // Setup authentication (now optional)
+                setupAuthentication();
+                
+                // Load available voices for TTS (some browsers need this)
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.onvoiceschanged = function() {
+                        // Voices loaded
+                        const voices = window.speechSynthesis.getVoices();
+                        console.log(`Loaded ${voices.length} voices for speech synthesis`);
+                    };
+                }
+                
+                console.log("Application initialization completed successfully.");
+            } catch (error) {
+                console.error("Error during application initialization:", error);
+                showNotification("There was a problem initializing the application. Please refresh the page.", "error");
+            }
+        };
     </script>
-
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-
-        .container {
-            background: white;
-            color: #333;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            max-width: 90%;
-            width: 100%;
-            text-align: center;
-        }
-
-        h2 {
-            color: #2a5298;
-            font-size: 20px;
-        }
-
-        .input-field {
-            margin: 10px 0;
-            padding: 12px;
-            width: 90%;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        .button {
-            padding: 12px;
-            width: 100%;
-            margin: 10px 0;
-            border: none;
-            border-radius: 6px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .button:hover {
-            background: linear-gradient(135deg, #2575fc, #6a11cb);
-        }
-
-        #searchButton {
-            display: none;
-        }
-
-        #results {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .result-item {
-            margin: 10px 0;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        .contributor {
-            display: block;
-            margin-top: 5px;
-            font-size: 14px;
-            color: #666;
-            font-style: italic;
-        }
-
-        #addFormContainer {
-            display: none;
-            margin-top: 20px;
-        }
-
-        /* Responsive design */
-        @media (max-width: 480px) {
-            body {
-                height: auto;
-                padding: 20px;
-            }
-
-            .container {
-                padding: 15px;
-            }
-
-            .button {
-                font-size: 16px;
-            }
-        }
-
-        /* Style the progress bar */
-        #progressContainer {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        #progressBar {
-            height: 20px;
-            width: 0%;
-            background-color: #4caf50;
-            border-radius: 5px;
-        }
-        
-        /* Style for the optional field notice */
-        .optional-field {
-            font-size: 12px;
-            color: #666;
-            margin-top: -5px;
-            margin-bottom: 10px;
-            text-align: left;
-            margin-left: 5%;
-        }
-        
-        /* Style the Contact Us link */
-        #contactUsLink {
-            position: fixed;  /* Fix it in place */
-            bottom: 20px;  /* Distance from the bottom of the page */
-            right: 20px;   /* Distance from the right of the page */
-            font-size: 14px;  /* Smaller font size */
-            color: #fff;  /* White text */
-            background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
-            padding: 8px 12px;  /* Padding around the link */
-            border-radius: 6px;  /* Rounded corners */
-            text-decoration: none;  /* Remove underline */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);  /* Add a small shadow */
-            transition: all 0.3s ease;  /* Smooth transition for hover effect */
-        }
-
-        #contactUsLink:hover {
-            background-color: rgba(0, 0, 0, 0.8);  /* Darker background on hover */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);  /* Stronger shadow on hover */
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <h2>🔎 English ↔ Kunama Translation</h2>
-        <input type="text" id="searchInput" class="input-field" placeholder="Start typing...">
-        <div id="results"></div>
-        <div id="statusMessage"></div>
-
-        <label>
-            <input type="checkbox" id="addNewCheckbox"> Add New (Tama Kitafe)
-        </label>
-        <div id="addFormContainer">
-            <input type="text" id="newPhrase" class="input-field" placeholder="Enter new phrase">
-            <input type="text" id="newTranslation" class="input-field" placeholder="Enter translation">
-            <input type="text" id="contributorName" class="input-field" placeholder="Your name (optional)">
-            <div class="optional-field">* Your name will be shown alongside this translation if approved</div>
-            <button id="addPhraseButton" class="button">Add (Itafe)</button>
-        </div>
-        <!-- Progress bar -->
-        <div id="progressContainer">
-            <p id="progressText">0/5000 submissions needed from users (0%)</p>
-            <div style="background-color: #ccc; border-radius: 5px; height: 20px; width: 100%;">
-                <div id="progressBar"></div>
-            </div>
-        </div>
-    </div>
-    <a href="https://www.facebook.com/NativeEritrean" target="_blank" id="contactUsLink">Contact Us</a>
 </body>
-
 </html>
