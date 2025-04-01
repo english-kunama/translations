@@ -2500,20 +2500,20 @@
                 if ('speechSynthesis' in window) {
                     const actionsContainer = resultItem.querySelector('.result-actions');
                     
-                    // Add TTS button for phrase (English)
+                    // Add TTS button for phrase (Kunama)
                     const ttsButtonPhrase = document.createElement('button');
                     ttsButtonPhrase.className = 'tts-button';
-                    ttsButtonPhrase.title = 'Speak English';
+                    ttsButtonPhrase.title = 'Speak Kunama';
                     ttsButtonPhrase.setAttribute('data-text', entry.phrase);
-                    ttsButtonPhrase.innerHTML = '🔊 EN';
+                    ttsButtonPhrase.innerHTML = '🔊 KU';
                     actionsContainer.appendChild(ttsButtonPhrase);
                     
-                    // Add TTS button for translation (Kunama)
+                    // Add TTS button for translation (English)
                     const ttsButtonTrans = document.createElement('button');
                     ttsButtonTrans.className = 'tts-button';
-                    ttsButtonTrans.title = 'Speak Kunama';
+                    ttsButtonTrans.title = 'Speak English';
                     ttsButtonTrans.setAttribute('data-text', entry.translation);
-                    ttsButtonTrans.innerHTML = '🔊 KU';
+                    ttsButtonTrans.innerHTML = '🔊 EN';
                     actionsContainer.appendChild(ttsButtonTrans);
                     
                     // Add event listeners for TTS buttons
