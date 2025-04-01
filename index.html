@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://raw.githubusercontent.com/english-kunama/translations/main/Kunama-Flag.png" type="image/png">
-    <title>Kunama Translation</title>
+	<link rel="icon" href="https://raw.githubusercontent.com/english-kunama/translations/main/Kunama-Flag.png" type="image/png">
+    <title>English ↔ Kunama Translation</title>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -44,14 +44,23 @@
         }
 
         // Function to add a new phrase to Firebase (pending for approval)
-        function addNewPhraseToFirebase(phrase, translation) {
+        function addNewPhraseToFirebase(phrase, translation, contributor) {
             const newSubmissionsRef = ref(db, 'pending_submissions');
             const newPhraseRef = push(newSubmissionsRef);
-            set(newPhraseRef, { 
+            
+            // Create submission object with contributor name if provided
+            const submissionData = { 
                 phrase, 
                 translation, 
                 timestamp: new Date().toISOString()
-            }).then(() => {
+            };
+            
+            // Only add contributor field if a name was provided
+            if (contributor && contributor.trim() !== "") {
+                submissionData.contributor = contributor.trim();
+            }
+            
+            set(newPhraseRef, submissionData).then(() => {
                 // Increment the submission count
                 const submissionCountRef = ref(db, 'submission_count');
                 get(submissionCountRef).then((snapshot) => {
@@ -70,9 +79,10 @@
                     console.error("Error fetching submission count:", error);
                 });
 
-                document.getElementById("statusMessage").innerText = "✅ Added, waiting for approval!";
+                document.getElementById("statusMessage").innerText = "✅ Phrase submitted, waiting for approval!";
                 document.getElementById("newPhrase").value = "";  
                 document.getElementById("newTranslation").value = "";
+                document.getElementById("contributorName").value = "";
 
                 // Update the progress bar after successful submission
                 updateProgressBar();
@@ -149,9 +159,15 @@
                 // Display results
                 if (limitedResults.length > 0) {
                     limitedResults.forEach(entry => {
+                        // Check if entry has a contributor name
+                        const contributorInfo = entry.contributor ? 
+                            `<span class="contributor">Submitted by: ${entry.contributor}</span>` : 
+                            "";
+                            
                         resultsContainer.innerHTML += ` 
                             <div class="result-item">
                                 <p><strong>${entry.phrase}</strong> → ${entry.translation}</p>
+                                ${contributorInfo}
                             </div>
                         `;
                     });
@@ -175,7 +191,7 @@
         // Event listener for the search input field
         document.getElementById("searchInput").addEventListener("input", debounceSearch);
 
-        // Event listener for add new phrase checkbox
+        // Event listener for add new checkbox
         document.getElementById("addNewCheckbox").addEventListener("change", function() {
             document.getElementById("addFormContainer").style.display = this.checked ? "block" : "none";
         });
@@ -184,8 +200,10 @@
         document.getElementById("addPhraseButton").addEventListener("click", () => {
             const phrase = document.getElementById("newPhrase").value.trim();
             const translation = document.getElementById("newTranslation").value.trim();
+            const contributor = document.getElementById("contributorName").value.trim();
+            
             if (phrase && translation) {
-                addNewPhraseToFirebase(phrase, translation);
+                addNewPhraseToFirebase(phrase, translation, contributor);
             } else {
                 document.getElementById("statusMessage").innerText = "❗ Please enter both phrase and translation.";
             }
@@ -267,6 +285,14 @@
             color: #333;
             font-size: 16px;
         }
+        
+        .contributor {
+            display: block;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
 
         #addFormContainer {
             display: none;
@@ -301,6 +327,17 @@
             background-color: #4caf50;
             border-radius: 5px;
         }
+        
+        /* Style for the optional field notice */
+        .optional-field {
+            font-size: 12px;
+            color: #666;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            text-align: left;
+            margin-left: 5%;
+        }
+        
         /* Style the Contact Us link */
         #contactUsLink {
             position: fixed;  /* Fix it in place */
@@ -334,9 +371,11 @@
             <input type="checkbox" id="addNewCheckbox"> Add New (Tama Kitafe)
         </label>
         <div id="addFormContainer">
-            <input type="text" id="newPhrase" class="input-field" placeholder="English...">
-            <input type="text" id="newTranslation" class="input-field" placeholder="Kunama...">
-            <button id="addPhraseButton" class="button">Add (Itafe) </button>
+            <input type="text" id="newPhrase" class="input-field" placeholder="Enter new phrase">
+            <input type="text" id="newTranslation" class="input-field" placeholder="Enter translation">
+            <input type="text" id="contributorName" class="input-field" placeholder="Your name (optional)">
+            <div class="optional-field">* Your name will be shown alongside this translation if approved</div>
+            <button id="addPhraseButton" class="button">Add (Itafe)</button>
         </div>
         <!-- Progress bar -->
         <div id="progressContainer">
