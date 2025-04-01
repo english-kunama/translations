@@ -848,6 +848,65 @@
                 padding: 5px 8px;
                 font-size: 14px;
             }
+
+/* Mobile-friendly adjustments */
+		@media screen and (max-width: 768px) {
+			body {
+				flex-direction: column;
+				padding: 10px;
+			}
+
+			.container {
+				width: 100%;
+				max-width: 95%;
+				padding: 15px;
+			}
+
+			h2, h3 {
+				font-size: 18px;
+			}
+
+			.input-field {
+				width: 100%;
+				font-size: 14px;
+			}
+
+			.button {
+				font-size: 16px;
+				padding: 10px;
+			}
+
+			.result-item {
+				font-size: 14px;
+				padding: 10px;
+			}
+
+			.history-button {
+				top: 60px;
+				right: 10px;
+			}
+
+			.search-history-container {
+				width: 90%;
+				right: 5%;
+				top: 100px;
+			}
+
+			.leaderboard-container,
+			.recent-translations-container,
+			.search-filter-container {
+				padding: 10px;
+				font-size: 14px;
+			}
+
+			.modal-content {
+				width: 90%;
+				padding: 15px;
+			}
+		}
+
+
+            
         }
     </style>
 </head>
